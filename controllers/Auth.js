@@ -1,5 +1,6 @@
 const Gameusers = require("../models/Gameusers")
 
+const bcrypt = require('bcrypt');
 const jsonwebtokenPromisified = require('jsonwebtoken-promisified');
 const path = require("path");
 
