@@ -1,3 +1,4 @@
+const Gameusers = require("../models/Gameusers")
 const fs = require('fs');
 const path = require("path");
 const publicKey = fs.readFileSync(path.resolve(__dirname, "../keygen/public-key.pem"), 'utf-8');
@@ -15,14 +16,33 @@ const verifyJWT = async (token) => {
 };
 
 exports.protectplayer = async (req, res, next) => {
-    const token = req.cookies.sessionToken
+    const token = req.headers.authorization
 
     if (!token){
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
     try{
-        const decodedToken = await verifyJWT(token);
+        if (!token.startsWith("Bearer")){
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        const headerpart = token.split(' ')[1]
+
+        const decodedToken = await verifyJWT(headerpart);
+
+        const userdata = await Gameusers.findOne({_id: decodedToken.id})
+        .select("-password")
+        .then(data => data)
+        .catch(err => res.status(401).json({ message: 'Unauthorized' }))
+
+        if (decodedToken.token != userdata.token){
+            return res.status(401).json({ message: 'duallogin' })
+        }
+
+        if (decodedToken.status != "active"){
+            return res.status(401).json({ message: 'banned' })
+        }
+
         req.user = decodedToken;
         next();
     } catch (error) {

@@ -28,7 +28,7 @@ exports.authlogin = async (req, res) => {
                 Gameusers.findByIdAndUpdate({_id: user._id}, {$set: { token: token}}, { new: true })
                 .select("-password")
                 .then(async () => {
-                    const payload = { id: user._id, token: token }
+                    const payload = { id: user._id, username: user.username, status: user.status, token: token }
 
                     try {
                         jwtoken = await jsonwebtokenPromisified.sign(payload, privateKey, { algorithm: 'RS256' });
@@ -37,8 +37,11 @@ exports.authlogin = async (req, res) => {
                         return res.status(500).json({ error: 'Internal Server Error' });
                     }
 
-                    res.cookie('sessionToken', jwtoken, { httpOnly: true })
-                    res.json({message: "success"})
+                    const data = {
+                        token: jwtoken
+                    }
+
+                    res.json({message: "success", data: data})
                 })
                 .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
             }
