@@ -19,6 +19,9 @@ const GameusersSchema = new mongoose.Schema(
         },
         token: {
             type: String,
+        },
+        webtoken: {
+            type: String
         }
     },
     {

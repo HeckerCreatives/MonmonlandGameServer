@@ -29,7 +29,8 @@ exports.authlogin = async (req, res) => {
                 .select("-password")
                 .then(async () => {
                     const payload = { id: user._id, username: user.username, status: user.status, token: token }
-
+                    let jwtoken = ""
+                    
                     try {
                         jwtoken = await jsonwebtokenPromisified.sign(payload, privateKey, { algorithm: 'RS256' });
                     } catch (error) {
