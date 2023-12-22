@@ -23,7 +23,12 @@ exports.dashboardplayer = async (req, res) => {
     .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
-    data["pools"] = pools
+    data["pools"] = {
+        username: pools.owner.username,
+        status: pools.status,
+        rank: pools.rank,
+        subscription: pools.subscription
+    }
 
     //  FOR THE WALLETS
     const wallets = await Gamewallet.find({owner: new mongoose.Types.ObjectId(id)})
