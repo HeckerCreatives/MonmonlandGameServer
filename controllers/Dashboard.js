@@ -25,7 +25,7 @@ exports.dashboardplayer = async (req, res) => {
 
     data["pools"] = {
         username: pools.owner.username,
-        status: pools.status,
+        status: pools.status.charAt(0).toUpperCase() + pools.status.slice(1),
         rank: pools.rank,
         subscription: pools.subscription
     }
