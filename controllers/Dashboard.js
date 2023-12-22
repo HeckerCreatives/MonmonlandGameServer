@@ -31,11 +31,11 @@ exports.dashboardplayer = async (req, res) => {
     .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
-    data["wallets"] = {
-        "monstercoin": wallets.filter(e => e.wallettype == "monstercoin")[0],
-        "monstergem": wallets.filter(e => e.wallettype == "monstergem")[0],
-        "balance": wallets.filter(e => e.wallettype == "balance")[0]
-    }
+    data["wallets"] = {}
+    wallets.forEach(wallet => {
+        const { wallettype, amount } = wallet;
+        data.wallets[wallettype] = amount;
+    });
 
     //  FOR THE MC TOTAL VALUE
     const totalmcval = await Monmoncoin.findOne({name: "Monster Coin"})
@@ -71,7 +71,12 @@ exports.dashboardplayer = async (req, res) => {
     .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
-    data["walletscutoff"] = walletscutoff
+    data["walletscutoff"] = {}
+
+    walletscutoff.forEach(walletscutoff => {
+        const { wallettype, amount } = walletscutoff;
+        data.walletscutoff[wallettype] = amount;
+    });
 
     const playerlb = await Leaderboard.findOne({owner: new mongoose.Types.ObjectId(id)})
     .then(data => data)
@@ -118,6 +123,17 @@ exports.findwalletcutoff = (req, res) => {
 
     Walletscutoff.find({owner: new mongoose.Types.ObjectId(id)})
     .select("-owner -createdAt -updatedAt -_id")
-    .then(data => res.json({message: "success", data: data}))
+    .then(data => {
+        let finaldata = {}
+
+        finaldata["walletscutoff"] = {}
+
+        data.forEach(walletscutoff => {
+            const { wallettype, amount } = walletscutoff;
+            finaldata.walletscutoff[wallettype] = amount;
+        });
+
+        res.json({message: "success", data: finaldata})
+    })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }

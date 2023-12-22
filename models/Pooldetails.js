@@ -15,7 +15,10 @@ const PooldetailsSchema = new mongoose.Schema(
             type: String,
             default: "none"
         },
-        
+        subscription: {
+            type: String,
+            default: "Pearl"
+        }
     },
     {
         timestamps: true
