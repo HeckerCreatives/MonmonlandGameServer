@@ -48,6 +48,9 @@ exports.equiptools = async (req, res) => {
         else if (tool.expiration >= DateTimeServer.GetUnixtime()){
             await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), _id: new mongoose.Types.ObjectId(toolid)}, {expiration: 0, isowned: 0, isequip: 0})
             .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+            
+            await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: "1"}, {isequip: 1})
+            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
             return res.json({message: "expired"})
         }
