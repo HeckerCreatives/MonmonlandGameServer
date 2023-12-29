@@ -13,7 +13,7 @@ const EquipmentSchema = new mongoose.Schema(
             type: String,
         },
         expiration: {
-            type: String,
+            type: Number,
         },
         isequip: {
             type: String,

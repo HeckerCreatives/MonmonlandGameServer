@@ -1,10 +1,15 @@
 const Equipment = require("../models/Equipment")
-const Cosmetics = require("../models/Cosmetics")
 const { default: mongoose } = require("mongoose")
-const { DateTimeServer } = require("../utils/Datetimetools")
+const { checktoolexpiration, checkalltoolsexpiration } = require("../utils/Toolexpiration")
 
-exports.gettools = (req, res) => {
+exports.gettools = async (req, res) => {
     const { id } = req.user
+
+    const check = await checkalltoolsexpiration(id)
+
+    if (check.message != "success"){
+        return res.status(400).json({ message: "bad-request" })
+    }
 
     Equipment.find({owner: new mongoose.Types.ObjectId(id)})
     .then(data => {
@@ -32,28 +37,25 @@ exports.gettools = (req, res) => {
 exports.equiptools = async (req, res) => {
     const { id } = req.user
     const { toolid, previoustoolid } = req.body
-    
-    const tool = await Equipment.findOne({owner: new mongoose.Types.ObjectId(id), _id: new mongoose.Types.ObjectId(toolid)})
-    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
-    if (tool.isequip == "1"){
+    const check = await checktoolexpiration(id, toolid)
+
+    if (check.message == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+    else if (check.message == "notexist"){
+        return res.status(400).json({ message: "notexist" })
+    }
+    else if (check.message == "expired"){
+        return res.status(400).json({ message: "expired" })
+    }
+
+    if (check.data.isequip == "1"){
         return res.json({message: "already equip"})
     }
 
-    if (tool.type != "1"){
-        if (tool.isowned != "1"){
-            return res.json({message: "not owned"})
-        }
-
-        else if (tool.expiration >= DateTimeServer.GetUnixtime()){
-            await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), _id: new mongoose.Types.ObjectId(toolid)}, {expiration: 0, isowned: 0, isequip: 0})
-            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
-            
-            await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: "1"}, {isequip: 1})
-            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
-
-            return res.json({message: "expired"})
-        }
+    if (check.data.isowned != "1"){
+        return res.json({message: "not owned"})
     }
 
     if (!previoustoolid){

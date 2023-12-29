@@ -5,6 +5,7 @@ const routers = app => {
     app.use("/dashboard", require("./Dashboard"))
     app.use("/personal", require("./Personal"))
     app.use("/tools", require("./Tools"))
+    app.use("/clocks", require("./Clock"))
 }
 
 module.exports = routers

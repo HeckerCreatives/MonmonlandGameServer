@@ -13,7 +13,10 @@ const cosmeticsSchema = new mongoose.Schema(
             type: String  // ring / etc.
         },
         expiration: {
-            type: String,   // unixtime / permanent
+            type: Number,   // unixtime 
+        },
+        permanent: {
+            type: String // permanent / nonpermanent
         },
         isequip: {
             type: String, // 0 & 1
