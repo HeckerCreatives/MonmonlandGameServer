@@ -4,6 +4,7 @@ const fs = require('fs');
 const bcrypt = require('bcrypt');
 const jsonwebtokenPromisified = require('jsonwebtoken-promisified');
 const path = require("path");
+const { DateTimeServer } = require("../utils/Datetimetools")
 
 const privateKey = fs.readFileSync(path.resolve(__dirname, "../keygen/private-key.pem"), 'utf-8');
 
@@ -39,7 +40,8 @@ exports.authlogin = async (req, res) => {
                     }
 
                     const data = {
-                        token: jwtoken
+                        token: jwtoken,
+                        datetime: DateTimeServer()
                     }
 
                     res.json({message: "success", data: data})
