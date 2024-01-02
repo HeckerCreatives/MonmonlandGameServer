@@ -60,7 +60,7 @@ exports.equipclock = async (req, res) => {
         return res.json({message: "not owned"})
     }
 
-    if (!previousclockid){
+    if (previousclockid){
         await Clock.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), _id: new mongoose.Types.ObjectId(previousclockid)}, {isequip: 0})
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
     }
