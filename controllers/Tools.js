@@ -43,7 +43,6 @@ exports.equiptools = async (req, res) => {
 
     console.log(req.body)
     console.log(toolid, previoustoolid)
-    console.log(req)
 
     if (check.message == "bad-request"){
         return res.status(400).json({ message: "bad-request" })
