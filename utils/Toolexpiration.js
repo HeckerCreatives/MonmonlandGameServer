@@ -72,18 +72,42 @@ exports.checkalltoolsexpiration = async (id) => {
 
     await Equipment.updateMany(filter, update)
     .then(async () => {
-        await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: "1"}, {isequip: "1"})
-        .then(() => {
-            response = {message: "success"}
-            return
-        })
+        
+        let equipped = false;
+
+        const equipments = await Equipment.find({owner: new mongoose.Types.ObjectId(id)})
+        .then(data => data)
         .catch(err => {
-            response = {message: "bad-request"}
+            response = {message: "bad-request", data: err.message}
             return
         })
+
+
+        equipments.map(e => {
+            if (e.type != "1"){
+                if (e.isequip == "1"){
+                    equipped = true
+                }
+            }
+        })
+
+        if (!equipped){
+            await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: "1"}, {isequip: "1"})
+            .then(() => {
+                response = {message: "success"}
+                return
+            })
+            .catch(err => {
+                response = {message: "bad-request", data: err.message}
+                return
+            })
+        }
+
+        response = {message: "success"}
+        return
     })
     .catch(err => {
-        response = {message: "bad-request"}
+        response = {message: "bad-request", data: err.message}
         return
     })
 

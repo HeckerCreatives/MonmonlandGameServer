@@ -11,6 +11,7 @@ exports.gettools = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
 
+
     Equipment.find({owner: new mongoose.Types.ObjectId(id)})
     .then(data => {
         if (!data){
@@ -58,7 +59,7 @@ exports.equiptools = async (req, res) => {
         return res.json({message: "not owned"})
     }
 
-    if (previoustoolid){
+    if (previoustoolid && previoustoolid != ""){
         await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), _id: new mongoose.Types.ObjectId(previoustoolid)}, {isequip: 0})
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
     }
