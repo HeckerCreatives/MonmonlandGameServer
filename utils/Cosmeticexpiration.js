@@ -24,3 +24,30 @@ exports.checkallcosmeticsexpiration = async (id) => {
 
     return response
 }
+
+exports.checkcosmeticexpiration = async(id, itemid) => {
+    const response = await Cosmetics.findOne({owner: new mongoose.Types.ObjectId(id), _id: new mongoose.Types.ObjectId(itemid)})
+    .then(data => {
+        if (!data){
+            return {message: "notexist"}
+        }
+
+        if (data.permanent == "nonpermanent" && data.expiration <= DateTimeServer()){
+            Cosmetics.findByIdAndDelete(itemid)
+            .then(() => {
+                return {message: "expired"}
+            })
+            .catch(err => {
+                return {message: "bad-request"}
+            })
+        }
+        else{
+            return {message: "notexpired", data: data}
+        }
+    })
+    .catch(err => {
+        return {message: "bad-request"}
+    })
+    
+    return response
+}

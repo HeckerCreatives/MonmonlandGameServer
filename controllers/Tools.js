@@ -41,9 +41,6 @@ exports.equiptools = async (req, res) => {
 
     const check = await checktoolexpiration(id, toolid)
 
-    console.log(req.body)
-    console.log(toolid, previoustoolid)
-
     if (check.message == "bad-request"){
         return res.status(400).json({ message: "bad-request" })
     }
