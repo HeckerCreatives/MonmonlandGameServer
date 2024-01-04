@@ -68,8 +68,12 @@ exports.checkenergyringequip = async (id) => {
 
 
 exports.checkequipring = async (id) => {
-    const maximumenergy = await Cosmetics.find({owner: new mongoose.Types.ObjectId(id), type: "ring"})
+    const maximumenergy = await Cosmetics.findOne({owner: new mongoose.Types.ObjectId(id), type: "ring", isequip: "1"})
     .then(data => {
+        if (!data){
+            return 0
+        }
+
         switch(data.name){
             case "Pearl": 
                 return 5
