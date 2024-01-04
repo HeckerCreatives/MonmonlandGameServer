@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose")
 const Cosmetics = require("../models/Cosmetics")
-const { DateTimeServer } = require("../utils/Datetimetools")
+const { DateTimeServer } = require("./Datetimetools")
 
 exports.checkallcosmeticsexpiration = async (id) => {
     const time = DateTimeServer()
@@ -50,4 +50,40 @@ exports.checkcosmeticexpiration = async(id, itemid) => {
     })
     
     return response
+}
+
+exports.checkenergyringequip = async (id) => {
+    const checker = await Cosmetics.findOne({owner: new mongoose.Types.ObjectId(id), name: "Energy", type: "ring", isequip: "1"})
+    .then(data => {
+        if (!data){
+            return "noequip"
+        }
+
+        return "equip"
+    })
+    .catch(() => "bad-request")
+
+    return checker
+}
+
+
+exports.checkequipring = async (id) => {
+    const maximumenergy = await Cosmetics.find({owner: new mongoose.Types.ObjectId(id), type: "ring"})
+    .then(data => {
+        switch(data.name){
+            case "Pearl": 
+                return 5
+            case "Ruby":
+                return 10
+            case "Emerald":
+                return 20
+            case "Diamond":
+                return 30
+            default:
+                return 0
+        }
+    })
+    .catch(() => "bad-request")
+
+    return maximumenergy
 }

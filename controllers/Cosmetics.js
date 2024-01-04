@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose")
 const Cosmetics = require("../models/Cosmetics")
-const { checkallcosmeticsexpiration, checkcosmeticexpiration } = require("../utils/Cosmeticexpiration")
+const { checkallcosmeticsexpiration, checkcosmeticexpiration } = require("../utils/Cosmeticutils")
 
 exports.getcosmetics = async (req, res) => {
     const { id } = req.user
