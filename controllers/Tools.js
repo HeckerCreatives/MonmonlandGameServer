@@ -2,7 +2,7 @@ const Equipment = require("../models/Equipment")
 const { default: mongoose } = require("mongoose")
 const { checktoolexpiration, checkalltoolsexpiration, gettoolsamount } = require("../utils/Toolexpiration")
 const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
-const { DateTimeServer } = require("../utils/Datetimetools")
+const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 
 exports.gettools = async (req, res) => {
     const { id } = req.user
@@ -103,7 +103,7 @@ exports.buytools = async (req, res) => {
     const sendcoms = await sendmgtounilevel(toolsamount, id)
 
     if (sendcoms == "success"){
-        const time = DateTimeServer()
+        const time = DateTimeServerExpiration(30)
         await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: toolstype}, {isowned: "1", expiration: time})
         .then(() => {
             return res.json({message: "success"})
