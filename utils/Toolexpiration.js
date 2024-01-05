@@ -113,3 +113,27 @@ exports.checkalltoolsexpiration = async (id) => {
 
     return response
 }
+
+exports.gettoolsamount = (toolstype) => {
+    let toolsamount = 0;
+
+    switch(toolstype){
+        case "2":
+            toolsamount = 10
+            break;
+        case "3":
+            toolsamount = 20
+            break;
+        case "4":
+            toolsamount = 30
+            break;
+        case "5":
+            toolsamount = 40
+            break;
+        default:
+            toolsamount = 0;
+            break;
+    }
+
+    return toolsamount;
+}

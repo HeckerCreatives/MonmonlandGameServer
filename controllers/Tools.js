@@ -1,6 +1,8 @@
 const Equipment = require("../models/Equipment")
 const { default: mongoose } = require("mongoose")
-const { checktoolexpiration, checkalltoolsexpiration } = require("../utils/Toolexpiration")
+const { checktoolexpiration, checkalltoolsexpiration, gettoolsamount } = require("../utils/Toolexpiration")
+const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
+const { DateTimeServer } = require("../utils/Datetimetools")
 
 exports.gettools = async (req, res) => {
     const { id } = req.user
@@ -68,4 +70,47 @@ exports.equiptools = async (req, res) => {
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     return res.json({message: "success"})
+}
+
+exports.buytools = async (req, res) => {
+    const { id } = req.user
+    const { toolstype } = req.body
+
+    if (toolstype != "2" && toolstype != "3" && toolstype != "4" && toolstype != "5"){
+        return res.json({message: "toolsnotexist"})
+    }
+
+    let toolsamount = gettoolsamount(toolstype)
+
+    if (toolsamount <= 0){
+        return res.json({message: "toolsamountiszero"})
+    }
+
+    const checkwallet = await checkwalletamount(toolsamount, id)
+
+    if (checkwallet == "notexist"){
+        return res.json({message: "walletnotexist"})
+    }
+
+    if (checkwallet == "notenoughfunds"){
+        return res.json({message: "notenoughfunds"})
+    }
+
+    if (checkwallet == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    const sendcoms = await sendmgtounilevel(toolsamount, id)
+
+    if (sendcoms == "success"){
+        const time = DateTimeServer()
+        await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: toolstype}, {isowned: "1", expiration: time})
+        .then(() => {
+            return res.json({message: "success"})
+        })
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    }
+    else{
+        res.json({message: "failed"})
+    }
 }

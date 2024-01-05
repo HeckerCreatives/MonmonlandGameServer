@@ -56,7 +56,22 @@ exports.buysubscription = async (req, res) => {
     }
 
     if (sendcoms == "success"){
-        await Pooldetails.updateOne({owner: new mongoose.Types.ObjectId(id)}, {subscription: substype})
+        await Pooldetails.updateOne({owner: new mongoose.Types.ObjectId(id)}, [
+            {
+                $set: {
+                    subscription: substype,
+                    status: {
+                        $cond: {
+                            if: {
+                                $eq: [substype, "Diamond"]
+                            },
+                            then: "Active",
+                            else: "Inactive"
+                        }
+                    }
+                }
+            }
+        ])
         .then(() => {
             return res.json({message: "success"})
         })

@@ -172,3 +172,167 @@ exports.sendcommissiontounilevel = async(commissionAmount, id) => {
 
     return response;
 }
+
+exports.sendmgtounilevel = async(commissionAmount, id) => {
+    let response = ""
+    await Gameusers.findOne({_id: id})
+    .then(async sender => {
+
+        const pipeline = [
+            // Match the sender
+            {
+                $match: { _id: sender._id },
+            },
+            {
+                $graphLookup: {
+                    from: 'gameusers',
+                    startWith: '$referral',
+                    connectFromField: 'referral',
+                    connectToField: '_id',
+                    depthField: 'level',
+                    as: 'referralTree'
+                }
+            },
+            {
+                $unwind: '$referralTree'
+            },
+            {
+                $replaceRoot: { newRoot: '$referralTree' }
+            },
+            {
+                $lookup: {
+                    from: 'equipment', // Adjust to your actual collection name
+                    localField: '_id',
+                    foreignField: 'owner',
+                    as: 'equipmentData',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$equipmentData',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+        
+            // Unwind the nested array inside equipmentData
+            {
+                $unwind: {
+                    path: '$equipmentData',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+        
+            // Group after double unwind to eliminate duplicates
+            {
+                $group: {
+                    _id: '$_id',
+                    username: { $first: '$username' },
+                    level: { $first: '$level' },
+                    // ... (add other fields)
+                    equipmentData: { $addToSet: '$equipmentData' },
+                },
+            },
+        ];
+        
+        const unilevelresult = await Gameusers.aggregate(pipeline)
+        .catch(err => {
+            response = "bad-request"
+            return
+        });
+
+        const unilevelmg = {}
+
+        await unilevelresult.forEach(datalevel => {
+            unilevelmg[datalevel.level] = {
+                owner: new mongoose.Types.ObjectId(datalevel._id),
+                equipmentData: datalevel.equipmentData
+            }
+        })
+
+        let levelindex = 0;
+        const bulkOperationUnilvl = []
+        const historypipeline = []
+
+        for(var a = 0; a < Object.keys(unilevelmg).length; a++){
+            if (levelindex >= 5){
+                break;
+            }
+            
+            const owned = unilevelmg[a].equipmentData.some(tooldata => tooldata.isowned == '1' && tooldata.type != '1');
+
+            if (owned){
+
+                let amount = 0;
+
+                if (unilevelmg[a].owner == new mongoose.Types.ObjectId(process.env.MONMONLAND_ID)){
+                    amount = commissionAmount * getremainingmglevelpercentage(levelindex)
+                }
+                else{
+                    amount = commissionAmount * getmgunilevelpercentage(levelindex)
+                }
+
+                bulkOperationUnilvl.push({
+                    updateOne: {
+                        filter: { owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), wallettype: 'monstergemunilevel' },
+                        update: { $inc: { amount: amount}}
+                    }
+                })
+
+                historypipeline.push({owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), type: "Tools Unilevel", description: "Tools Unilevel", amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
+
+                levelindex++;
+            }
+            else
+            {
+                const amount = commissionAmount * getmgunilevelpercentage(levelindex);
+                historypipeline.push({owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), type: "Missed Tools Unilevel", description: " Missed Tools Unilevel", amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
+            }
+        }
+
+        await Gamewallet.bulkWrite(bulkOperationUnilvl)
+        .catch(() => response = "bad-request")
+        await Wallethistory.insertMany(historypipeline)
+        .catch(() => response = "bad-request")
+
+        response = "success"
+    })
+    .catch(err => {
+        response = "bad-request"
+    })
+
+    return response;
+}
+
+function getmgunilevelpercentage(level){
+    switch (level){
+        case 0:
+            return 0.06
+        case 1:
+            return 0.04
+        case 2:
+            return 0.03
+        case 3: 
+            return 0.02
+        case 4:
+            return 0.01
+        case 5:
+            return 0.01
+    }
+}
+
+function getremainingmglevelpercentage(level){
+    switch (level){
+        case 0:
+            return 0.17
+        case 1:
+            return 0.11
+        case 2:
+            return 0.07
+        case 3: 
+            return 0.04
+        case 4:
+            return 0.03
+        case 5:
+            return 0.01
+    }
+}
