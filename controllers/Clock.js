@@ -1,7 +1,8 @@
 const Clock = require("../models/Clock")
 const { default: mongoose } = require("mongoose")
-const { DateTimeServer } = require("../utils/Datetimetools")
-const { checkclockexpiration, checkallclockexpiration } = require("../utils/Clockexpiration")
+const { checkclockexpiration, checkallclockexpiration, getclocksamount } = require("../utils/Clockexpiration")
+const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
+const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 
 exports.getclock = async (req, res) => {
     const { id } = req.user
@@ -69,4 +70,47 @@ exports.equipclock = async (req, res) => {
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     res.json({message: "success"})
+}
+
+exports.buyclocks = async (req, res) => {
+    const { id } = req.user
+    const { clockstype } = req.body
+
+    if (clockstype != "1" && clockstype != "2" && clockstype != "3" && clockstype != "4"){
+        return res.json({message: "clocksnotexist"})
+    }
+
+    let clocksamount = getclocksamount(clockstype)
+
+    if (clocksamount <= 0){
+        return res.json({message: "clocksamountiszero"})
+    }
+
+    const checkwallet = await checkwalletamount(clocksamount, id)
+
+    if (checkwallet == "notexist"){
+        return res.json({message: "walletnotexist"})
+    }
+
+    if (checkwallet == "notenoughfunds"){
+        return res.json({message: "notenoughfunds"})
+    }
+
+    if (checkwallet == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    const sendcoms = await sendmgtounilevel(clocksamount, id, "Clocks Unilevel")
+
+    if (sendcoms == "success"){
+        const time = DateTimeServerExpiration(30)
+        await Clock.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: clockstype}, {isowned: "1", expiration: time})
+        .then(() => {
+            return res.json({message: "success"})
+        })
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    }
+    else{
+        res.json({message: "failed"})
+    }
 }

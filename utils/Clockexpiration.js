@@ -59,3 +59,27 @@ exports.checkallclockexpiration = async(id) => {
 
     return response
 }
+
+exports.getclocksamount = (clockstype) => {
+    let clocksamount = 0;
+
+    switch(clockstype){
+        case "1":
+            clocksamount = 10
+            break;
+        case "2":
+            clocksamount = 35
+            break;
+        case "3":
+            clocksamount = 50
+            break;
+        case "4":
+            clocksamount = 60
+            break;
+        default:
+            clocksamount = 0;
+            break;
+    }
+
+    return clocksamount;
+}

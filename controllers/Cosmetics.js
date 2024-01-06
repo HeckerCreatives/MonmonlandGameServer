@@ -1,6 +1,8 @@
 const { default: mongoose } = require("mongoose")
 const Cosmetics = require("../models/Cosmetics")
-const { checkallcosmeticsexpiration, checkcosmeticexpiration } = require("../utils/Cosmeticutils")
+const { checkallcosmeticsexpiration, checkcosmeticexpiration, getcosmeticsamount } = require("../utils/Cosmeticutils")
+const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
+const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 
 exports.getcosmetics = async (req, res) => {
     const { id } = req.user
@@ -66,4 +68,47 @@ exports.equipcosmetics = async (req, res) => {
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     return res.json({message: "success"})
+}
+
+exports.buycosmetics = async (req, res) => {
+    const { id } = req.user
+    const { cosmeticstype, itemname, itemtype } = req.body
+
+    if (cosmeticstype != "Rubyring" && cosmeticstype != "Emeraldring" && cosmeticstype != "Diamondring" && cosmeticstype != "Energyring"){
+        return res.json({message: "cosmeticsnotexist"})
+    }
+
+    let cosmeticsamount = getcosmeticsamount(cosmeticstype)
+
+    if (cosmeticsamount <= 0){
+        return res.json({message: "clocksamountiszero"})
+    }
+
+    const checkwallet = await checkwalletamount(cosmeticsamount, id)
+
+    if (checkwallet == "notexist"){
+        return res.json({message: "walletnotexist"})
+    }
+
+    if (checkwallet == "notenoughfunds"){
+        return res.json({message: "notenoughfunds"})
+    }
+
+    if (checkwallet == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    const sendcoms = await sendmgtounilevel(cosmeticsamount, id, "Cosmetics Unilevel")
+
+    if (sendcoms == "success"){
+        const time = DateTimeServerExpiration(30)
+        await Cosmetics.create({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype, expiration: time, permanent: "nonpermanent", isequip: "0"})
+        .then(() => {
+            return res.json({message: "success"})
+        })
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    }
+    else{
+        res.json({message: "failed"})
+    }
 }

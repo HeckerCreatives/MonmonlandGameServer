@@ -3,6 +3,8 @@ const EnergyInventory = require("../models/Energyinventory")
 const Energy = require("../models/Energy")
 const Pooldetails = require("../models/Pooldetails")
 const { checkenergyringequip, checkequipring } = require("../utils/Cosmeticutils")
+const { checkmcwalletamount } = require("../utils/Walletutils")
+const { checkenergyinventoryprice, checkenergyinventoryconsumable } = require("../utils/Energyutils")
 
 exports.getenergyinventory = (req, res) => {
     const { id } = req.user
@@ -112,6 +114,53 @@ exports.useenergyinventory = async (req, res) => {
         }])
 
         return res.json({message: "success"})
+    })
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+}
+
+exports.buyenergyinventory = async (req, res) => {
+    const { id } = req.user
+    const { itemname, itemtype, qty } = req.body
+
+    const energyprice = checkenergyinventoryprice(`${itemname}${itemtype}`)
+
+    if (energyprice <= 0){
+        return res.json({message: "toolsamountiszero"})
+    }
+
+    const finalamount = energyprice * qty
+
+    const checkwallet = await checkmcwalletamount(finalamount, id)
+
+    if (checkwallet == "notexist"){
+        return res.json({message: "walletnotexist"})
+    }
+
+    if (checkwallet == "notenoughfunds"){
+        return res.json({message: "notenoughfunds"})
+    }
+
+    if (checkwallet == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    await EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype})
+    .then(async dataenergy => {
+        if (!dataenergy){
+            await EnergyInventory.create({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype, amount: qty, consumableamount: checkenergyinventoryconsumable(`${itemname}${itemtype}`)})
+            .then(() => {
+                res.json({message: "success"})
+            })
+            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+            return
+        }
+
+        await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype}, {$inc: { amount: qty }})
+        .then(() => {
+            res.json({message: "success"})
+        })
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }

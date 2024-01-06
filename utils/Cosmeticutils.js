@@ -91,3 +91,27 @@ exports.checkequipring = async (id) => {
 
     return maximumenergy
 }
+
+exports.getcosmeticsamount = (cosmeticstype) => {
+    let cosmeticsamount = 0;
+
+    switch(cosmeticstype){
+        case "Rubyring":
+            cosmeticsamount = 5
+            break;
+        case "Emeraldring":
+            cosmeticsamount = 10
+            break;
+        case "Diamondring":
+            cosmeticsamount = 20
+            break;
+        case "Energyring":
+            cosmeticsamount = 30
+            break;
+        default:
+            cosmeticsamount = 0;
+            break;
+    }
+
+    return cosmeticsamount;
+}

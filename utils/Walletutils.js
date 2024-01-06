@@ -30,6 +30,33 @@ exports.checkwalletamount = async (amount, id) => {
     .catch(err => "bad-request")
 }
 
+exports.checkmcwalletamount = async (amount, id) => {
+    return await Gamewallet.findOne({owner: new mongoose.Types.ObjectId(id), wallettype: "monstercoin"})
+    .then(async data => {
+        if (!data){
+            return "notexist"
+        }
+
+        if (data.amount < amount){
+            return "notenoughfunds"
+        }
+
+        await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: "monstercoin"}, [{
+            $set: {
+                amount: {
+                    $max: [0, {
+                        $add: ["$amount", -amount]
+                    }]
+                }
+            }
+        }]).then(() => {
+            return "success"
+        })
+        .catch(err => "bad-request")
+    })
+    .catch(err => "bad-request")
+}
+
 exports.sendcommissiontounilevel = async(commissionAmount, id) => {
     let response = ""
     await Gameusers.findOne({_id: id})
@@ -173,7 +200,7 @@ exports.sendcommissiontounilevel = async(commissionAmount, id) => {
     return response;
 }
 
-exports.sendmgtounilevel = async(commissionAmount, id) => {
+exports.sendmgtounilevel = async(commissionAmount, id, historytype) => {
     let response = ""
     await Gameusers.findOne({_id: id})
     .then(async sender => {
@@ -232,6 +259,40 @@ exports.sendmgtounilevel = async(commissionAmount, id) => {
                     equipmentData: { $addToSet: '$equipmentData' },
                 },
             },
+            {
+                $lookup: {
+                    from: 'clocks', // Adjust to your actual collection name
+                    localField: '_id',
+                    foreignField: 'owner',
+                    as: 'clockData',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$clockData',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+        
+            // Unwind the nested array inside equipmentData
+            {
+                $unwind: {
+                    path: '$clockData',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+        
+            // Group after double unwind to eliminate duplicates
+            {
+                $group: {
+                    _id: '$_id',
+                    username: { $first: '$username' },
+                    level: { $first: '$level' },
+                    // ... (add other fields)
+                    equipmentData: { $first: '$equipmentData' },
+                    clockData: { $addToSet: '$clockData'}
+                },
+            },
         ];
         
         const unilevelresult = await Gameusers.aggregate(pipeline)
@@ -258,9 +319,11 @@ exports.sendmgtounilevel = async(commissionAmount, id) => {
                 break;
             }
             
-            const owned = unilevelmg[a].equipmentData.some(tooldata => tooldata.isowned == '1' && tooldata.type != '1');
+            const ownedtools = unilevelmg[a].equipmentData.some(tooldata => tooldata.isowned == '1' && tooldata.type != '1');
 
-            if (owned){
+            const ownedclocks = unilevelmg[a].clockdata == null ? false : unilevelmg[a].clockData.some(clockdata => clockdata.isowned == '1')
+
+            if (ownedtools || ownedclocks){
 
                 let amount = 0;
 
@@ -278,25 +341,30 @@ exports.sendmgtounilevel = async(commissionAmount, id) => {
                     }
                 })
 
-                historypipeline.push({owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), type: "Tools Unilevel", description: "Tools Unilevel", amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
+                historypipeline.push({owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), type: historytype, description: historytype, amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
 
                 levelindex++;
             }
             else
             {
                 const amount = commissionAmount * getmgunilevelpercentage(levelindex);
-                historypipeline.push({owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), type: "Missed Tools Unilevel", description: " Missed Tools Unilevel", amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
+                historypipeline.push({owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), type: `Missed ${historytype}`, description: `Missed ${historytype}`, amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
             }
         }
 
         await Gamewallet.bulkWrite(bulkOperationUnilvl)
-        .catch(() => response = "bad-request")
+        .catch((err) => {
+            console.log(err.message) 
+            response = "bad-request"
+            return
+        })
         await Wallethistory.insertMany(historypipeline)
         .catch(() => response = "bad-request")
 
         response = "success"
     })
     .catch(err => {
+        console.log(err.message) 
         response = "bad-request"
     })
 
