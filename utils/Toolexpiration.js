@@ -137,3 +137,9 @@ exports.gettoolsamount = (toolstype) => {
 
     return toolsamount;
 }
+
+exports.gettoolsequip = async (id) =>{
+    return await Equipment.findOne({owner: new mongoose.Types.ObjectId(id), isequip: "1"})
+    .then(data => data.type || 0)
+    .catch(err => "bad-request")
+}

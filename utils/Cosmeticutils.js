@@ -66,6 +66,12 @@ exports.checkenergyringequip = async (id) => {
     return checker
 }
 
+exports.checkcosmeticequip = async (id) => {
+    return await Cosmetics.findOne({owner: new mongoose.Types.ObjectId(id), isequip: '1'})
+    .then(data => data)
+    .catch(() => "bad-request")
+}
+
 
 exports.checkequipring = async (id) => {
     const maximumenergy = await Cosmetics.findOne({owner: new mongoose.Types.ObjectId(id), type: "ring", isequip: "1"})

@@ -83,3 +83,9 @@ exports.getclocksamount = (clockstype) => {
 
     return clocksamount;
 }
+
+exports.getclockequip = async (id) => {
+    return await Clock.findOne({owner: new mongoose.Types.ObjectId(id), isequip: "1"})
+    .then(data => data)
+    .catch(() => "bad-request")
+}

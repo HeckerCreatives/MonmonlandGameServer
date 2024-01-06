@@ -3,6 +3,7 @@ const { default: mongoose } = require("mongoose")
 const { checktoolexpiration, checkalltoolsexpiration, gettoolsamount } = require("../utils/Toolexpiration")
 const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
+const { computemerchcomplan } = require("../webutils/Communityactivityutils")
 
 exports.gettools = async (req, res) => {
     const { id } = req.user
@@ -105,7 +106,13 @@ exports.buytools = async (req, res) => {
     if (sendcoms == "success"){
         const time = DateTimeServerExpiration(30)
         await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: toolstype}, {isowned: "1", expiration: time})
-        .then(() => {
+        .then(async () => {
+            const complan = await computemerchcomplan(toolsamount, "tools")
+
+            if (complan != "success"){
+                res.status(400).json({ message: "bad-request" })
+            }
+            
             return res.json({message: "success"})
         })
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))

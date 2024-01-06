@@ -125,7 +125,7 @@ exports.buyenergyinventory = async (req, res) => {
     const energyprice = checkenergyinventoryprice(`${itemname}${itemtype}`)
 
     if (energyprice <= 0){
-        return res.json({message: "toolsamountiszero"})
+        return res.json({message: "energyamountiszero"})
     }
 
     const finalamount = energyprice * qty

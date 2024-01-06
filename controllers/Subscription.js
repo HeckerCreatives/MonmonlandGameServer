@@ -1,5 +1,6 @@
 const { sendcommissiontounilevel, checkwalletamount } = require("../utils/Walletutils")
 const { getsubsamount, getpooldetails } = require("../utils/Pooldetailsutils")
+const { computecomplan } = require("../webutils/Communityactivityutils")
 const Pooldetails = require("../models/Pooldetails")
 const { default: mongoose } = require("mongoose")
 
@@ -72,7 +73,14 @@ exports.buysubscription = async (req, res) => {
                 }
             }
         ])
-        .then(() => {
+        .then(async () => {
+
+            const complan = await computecomplan(finalsubsamount)
+
+            if (complan != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+
             return res.json({message: "success"})
         })
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))

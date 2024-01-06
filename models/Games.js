@@ -12,8 +12,11 @@ const IngamegamesSchema = new mongoose.Schema(
         status: {
             type: String,
         },
+        timestarted: {
+            type: Number
+        },
         unixtime: {
-            type: String,
+            type: Number,
         },
         harvestmc: {
             type: Number,

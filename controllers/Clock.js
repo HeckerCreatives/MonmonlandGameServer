@@ -3,6 +3,7 @@ const { default: mongoose } = require("mongoose")
 const { checkclockexpiration, checkallclockexpiration, getclocksamount } = require("../utils/Clockexpiration")
 const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
+const { computemerchcomplan } = require("../webutils/Communityactivityutils")
 
 exports.getclock = async (req, res) => {
     const { id } = req.user
@@ -105,7 +106,14 @@ exports.buyclocks = async (req, res) => {
     if (sendcoms == "success"){
         const time = DateTimeServerExpiration(30)
         await Clock.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: clockstype}, {isowned: "1", expiration: time})
-        .then(() => {
+        .then(async () => {
+
+            const complan = await computemerchcomplan(clocksamount, "clock")
+
+            if (complan != "success"){
+                res.status(400).json({ message: "bad-request" })
+            }
+            
             return res.json({message: "success"})
         })
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
