@@ -2,7 +2,7 @@ const Ingamegames = require("../models/Games")
 const Playtimegrinding = require("../models/Playtimegrinding")
 const Energy = require("../models/Energy")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
-const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalmc, getfarm } = require("../utils/Gameutils")
+const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
@@ -209,7 +209,7 @@ exports.claimgame = async (req, res) => {
     if (totalMCFarmed < game.harvestmc){
         const tobeminus = game.harvestmc - totalMCFarmed
 
-        const minus = await minustototalmc("Monster Coin", tobeminus)
+        const minus = await minustototalcoins("Monster Coin", tobeminus)
 
         if (minus != "success"){
             return res.status(400).json({ message: "bad-request" })
@@ -219,7 +219,7 @@ exports.claimgame = async (req, res) => {
     if (totalMGFarmed < game.harvestmg){
         const tobeminus = game.harvestmg - totalMGFarmed
 
-        const minus = await minustototalmc("Monster Gem", tobeminus)
+        const minus = await minustototalcoins("Monster Gem", tobeminus)
 
         if (minus != "success"){
             return res.status(400).json({ message: "bad-request" })
