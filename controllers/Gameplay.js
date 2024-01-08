@@ -1,10 +1,11 @@
 const Ingamegames = require("../models/Games")
+const Playtimegrinding = require("../models/Playtimegrinding")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
 const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalmc, getfarm } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
-const { DateTimeGameExpiration, DateTimeServer } = require("../utils/Datetimetools")
+const { DateTimeGameExpiration, DateTimeServer, CalculateSecondsBetween, UnixtimeToDateTime } = require("../utils/Datetimetools")
 const { addwalletamount } = require("../utils/Walletutils")
 const { default: mongoose } = require("mongoose")
 
@@ -91,24 +92,71 @@ exports.playgame = async (req, res) => {
 exports.getgames = async (req, res) => {
     const { id } = req.user
 
-    const games = await Ingamegames.find({owner: new mongoose.Types.ObjectId(id)})
-    .then(data => data)
-    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    const result = await Ingamegames.aggregate([
+        {
+          $match: {
+            owner: new mongoose.Types.ObjectId(id)
+          },
+        },
+        {
+          $lookup: {
+            from: 'playtimegrindings', // the name of the Playtime collection
+            let: { ownerId: '$owner', gameType: '$type' },
+            pipeline: [
+                {
+                $match: {
+                    $expr: {
+                    $and: [
+                        { $eq: ['$owner', '$$ownerId'] },
+                        { $eq: ['$type', '$$gameType'] },
+                    ],
+                    },
+                },
+                },
+            ],
+            as: 'playtime',
+          },
+        },
+        {
+          $unwind: {
+            path: '$playtime',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            type: 1,
+            status: 1,
+            timestarted: 1,
+            unixtime: 1,
+            harvestmc: 1,
+            harvestmg: 1,
+            harvestap: 1,
+            playtime: {
+              $ifNull: ['$playtime.currenttime', 0]
+            },
+          },
+        },
+      ]);
 
-    const gamelist = {}
+      let data = {}
 
-    games.forEach(gamedata => {
-        const { type, status, unixtime, harvestmc, harvestmg } = gamedata
-
-        gamelist[type] = {
+      result.forEach(gameslist => {
+        const { type, status, unixtime, harvestmc, harvestmg, harvestap, timestarted, playtime } = gameslist;
+        
+        data[type] = {
             status: status,
             unixtime: unixtime,
             harvestmc: harvestmc,
-            harvestmg: harvestmg
+            harvestmg: harvestmg,
+            harvestap: harvestap,
+            timestarted: timestarted,
+            playtime: playtime
         }
-    })
+      })
 
-    return res.json({message: "success", data: gamelist})
+    return res.json({message: "success", data: data})
 }
 
 exports.claimgame = async (req, res) => {
@@ -156,6 +204,14 @@ exports.claimgame = async (req, res) => {
     .then(async () => {
         const mcadd = await addwalletamount(id, "balance", totalMCFarmed)
         const mgadd = await addwalletamount(id, "monstergemfarm", totalMCFarmed)
+
+        const endexpirationtime = UnixtimeToDateTime(DateTimeServer() > game.unixtime ? game.unixtime : DateTimeServer())
+        const startgrindtime = UnixtimeToDateTime(game.timestarted);
+
+        const finalsecondspassed = CalculateSecondsBetween(startgrindtime, endexpirationtime)
+
+        await Playtimegrinding.updateOne({owner: new mongoose.Types.ObjectId(id), type: gametype}, {$inc: {currenttime: finalsecondspassed}})
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
         if (mcadd != "success"){
             return res.status(400).json({ message: "bad-request" })

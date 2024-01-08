@@ -41,3 +41,35 @@ exports.DateTimeGameExpiration = (expiration) => {
 
     return newUnixTimeSeconds;
 }
+
+exports.CalculateSecondsBetween = (start, end) => {
+    // Parse the input strings into Date objects
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+
+    // Calculate the time difference in milliseconds
+    const timeDiff = endTime - startTime;
+
+    // Convert milliseconds to seconds
+    const seconds = Math.floor(timeDiff / 1000);
+
+    return seconds;
+}
+
+exports.UnixtimeToDateTime = (unixTimestamp) => {
+    // Create a new Date object using the Unix timestamp multiplied by 1000
+    const date = new Date(unixTimestamp * 1000);
+
+    // Get individual components of the date
+    const year = date.getUTCFullYear();
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed
+    const day = date.getUTCDate().toString().padStart(2, '0');
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+
+    // Construct the formatted date and time string
+    const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+
+    return formattedDateTime;
+}
