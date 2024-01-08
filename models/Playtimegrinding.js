@@ -9,18 +9,9 @@ const PlaytimegrindingSchema = new mongoose.Schema(
         type: {
             type: String
         },
-        day: {
-            type: Number,
-        },
-        hours: {
-            type: Number,
-        },
-        minute: {
-            type: Number,
-        },
-        seconds: {
-            type: Number,
-        },
+        currenttime: {
+            type: Number
+        }
     },
     {
         timestamps: true

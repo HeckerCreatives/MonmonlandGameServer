@@ -1,5 +1,6 @@
 const Ingamegames = require("../models/Games")
 const Playtimegrinding = require("../models/Playtimegrinding")
+const Energy = require("../models/Energy")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
 const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalmc, getfarm } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
@@ -67,6 +68,22 @@ exports.playgame = async (req, res) => {
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip.type)
     )
 
+    
+    //  Check energy
+    const energyamount = await Energy.findOne({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data.amount)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    if (!energyamount){
+        return res.json({message: "energynotexist"})
+    }
+
+    const energyconsumption = clockhoursadd(clocksequip.type)
+
+    if (energyamount < energyconsumption){
+        return res.json({message: "notenoughenergy"})
+    }
+
     const addtotalmc = await addtototalfarmmc(monstercoin, finalmg)
 
     if (addtotalmc.message != "success"){
@@ -84,6 +101,17 @@ exports.playgame = async (req, res) => {
     await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, { status: "playing", timestarted: DateTimeServer(), unixtime: expiredtime, harvestmc: monstercoin, harvestmg: finalmg})
     .then(async data => {
 
+        await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
+            $set: {
+                amount: {
+                    $max: [0, {
+                        $add: ["$amount", energyconsumption]
+                    }]
+                }
+            }
+        }])
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+        
         return res.json({message: "success", mc: monstercoin, mg: finalmg, expiration: expiredtime})
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
