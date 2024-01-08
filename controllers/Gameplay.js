@@ -105,7 +105,7 @@ exports.playgame = async (req, res) => {
             $set: {
                 amount: {
                     $max: [0, {
-                        $add: ["$amount", energyconsumption]
+                        $add: ["$amount", -energyconsumption]
                     }]
                 }
             }
