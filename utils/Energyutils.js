@@ -6,7 +6,7 @@ exports.checkenergyinventoryprice = (itemtype) => {
             itemamount = 1
             break;
         case "2energy":
-            itemaount = 3
+            itemamount = 3
             break;
         case "3energy":
             itemamount = 6
