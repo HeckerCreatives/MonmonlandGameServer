@@ -12,7 +12,12 @@ const DailyactivitiesSchema = new mongoose.Schema(
         status: {
             type: String,
         },
-        
+        taskpoints: {
+            type: Number
+        },
+        rewardsmc: {
+            type: Number
+        }
     },
     {
         timestamps: true

@@ -7,6 +7,7 @@ const Gameactivity = require("../modelweb/Gameactivity")
 const Walletscutoff = require("../models/Walletscutoff")
 const Monmoncoin = require("../modelweb/Monmoncoin")
 const Investorfunds = require("../modelweb/Investorfunds")
+const Wallethistory = require("../models/Wallethistory")
 const { default: mongoose } = require("mongoose")
 
 exports.dashboardplayer = async (req, res) => {
@@ -96,6 +97,25 @@ exports.dashboardplayer = async (req, res) => {
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     data["rank"] = rank
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const recruit = await Wallethistory.findOne({owner: new mongoose.Types.ObjectId(id), type: "Subscription Unilevel",  createdAt: {
+    $gte: today, // greater than or equal to the start of today
+    $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // less than the start of tomorrow
+    }}).then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    data["recruit"] = !recruit ? "0" : "1"
+
+    const tools = await Wallethistory.findOne({owner: new mongoose.Types.ObjectId(id), type: "Tools Unilevel",  createdAt: {
+    $gte: today, // greater than or equal to the start of today
+    $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // less than the start of tomorrow
+    }}).then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    data["tools"] = !tools ? "0" : "1"
 
     res.json({message: "success", data: data})
 }

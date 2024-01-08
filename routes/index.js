@@ -11,6 +11,7 @@ const routers = app => {
     app.use("/energyinventory", require("./Energyinventory"))
     app.use("/subscriptionshop", require("./Subscription"))
     app.use("/gameplay", require("./Gameplay"))
+    app.use("/dailyactivities", require("./Dailyactivities"))
 }
 
 module.exports = routers
