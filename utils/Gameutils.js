@@ -112,8 +112,6 @@ exports.mcmined = (toolstype, clocktype) => {
             break;
     }
 
-    console.log(amount, mcamount, toolstype)
-
     return amount
 }
 
@@ -252,7 +250,9 @@ exports.getfarm = (timestarted, unixtime, maxtotal) => {
     const expirationTime = unixtime;
 
     // Get the current time in Unix timestamp format
-    const currentTime = Math.floor(new Date().getTime() / 1000);
+    // const currentTime = Math.floor(new Date().getTime() / 1000);
+
+    const currentTime = 1704835417;
 
     // Maximum total coins to be farmed
     const maxTotalCoins = maxtotal;

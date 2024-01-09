@@ -3,8 +3,6 @@ exports.DateTimeServer = () => {
     
     // Get the Unix timestamp in milliseconds
     const unixTimeMilliseconds = date.getTime();
-
-    console.log(date)
         
     // Convert it to Unix timestamp in seconds
     const unixTimeSeconds = Math.floor(unixTimeMilliseconds / 1000);
