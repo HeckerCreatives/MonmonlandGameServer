@@ -223,7 +223,7 @@ exports.claimgame = async (req, res) => {
         }
     }
 
-    await 
+    // await 
 
     await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, {status: "pending", timestarted: 0, unixtime: 0, harvestmc: 0, harvestmg: 0, harvestap: 0})
     .then(async () => {

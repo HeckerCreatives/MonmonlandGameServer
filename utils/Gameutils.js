@@ -252,7 +252,7 @@ exports.getfarm = (timestarted, unixtime, maxtotal) => {
     // Get the current time in Unix timestamp format
     // const currentTime = Math.floor(new Date().getTime() / 1000);
 
-    const currentTime = 1704835417;
+    const currentTime = 1704834358;
 
     // Maximum total coins to be farmed
     const maxTotalCoins = maxtotal;
