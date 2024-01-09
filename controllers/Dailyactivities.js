@@ -81,8 +81,6 @@ exports.claimdaily = async (req, res) => {
                 return res.status(400).json({ message: "bad-request", data: err.message })
             })
 
-            console.log(recruit)
-
             if (!recruit){
                 return res.json({message: "tasknotcomplete"})
             }
@@ -107,8 +105,6 @@ exports.claimdaily = async (req, res) => {
 
         await Dailyactivities.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: type, status: "not-claimed"}, {status: "claimed"})
         .then(async () => {
-            console.log(data)
-            console.log(data.rewardsmc)
             const mc = await addwalletamount(id, "monstercoin", data.rewardsmc)
 
             if (mc != "success"){
