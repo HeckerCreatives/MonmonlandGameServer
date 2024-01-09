@@ -41,7 +41,7 @@ exports.authlogin = async (req, res) => {
 
                     const data = {
                         token: jwtoken,
-                        datetime: 1704834358
+                        datetime: DateTimeServer()
                     }
 
                     res.json({message: "success", data: data})
