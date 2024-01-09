@@ -246,7 +246,7 @@ exports.claimgame = async (req, res) => {
             return res.status(400).json({ message: "bad-request" })
         }
 
-        res.json({message: "success"})
+        res.json({message: "success", mcfarmed: totalMCFarmed, mgfarmed: totalMGFarmed})
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }
