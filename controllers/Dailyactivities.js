@@ -76,7 +76,10 @@ exports.claimdaily = async (req, res) => {
                 $gte: today, // greater than or equal to the start of today
                 $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // less than the start of tomorrow
             }}).then(data => data)
-            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+            .catch(err => {
+                console.log(err.message)
+                return res.status(400).json({ message: "bad-request", data: err.message })
+            })
 
             if (!recruit){
                 return res.json({message: "tasknotcomplete"})
@@ -90,7 +93,10 @@ exports.claimdaily = async (req, res) => {
                 $gte: today, // greater than or equal to the start of today
                 $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // less than the start of tomorrow
             }}).then(data => data)
-            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+            .catch(err => {
+                console.log(err.message)
+                return res.status(400).json({ message: "bad-request", data: err.message })
+            })
 
             if (!tools){
                 return res.json({message: "tasknotcomplete"})
@@ -108,7 +114,13 @@ exports.claimdaily = async (req, res) => {
             
             res.json({message: "success"})
         })
-        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+        .catch(err => {
+            console.log(err.message)
+            return res.status(400).json({ message: "bad-request", data: err.message })
+        })
     })
-    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    .catch(err => {
+        console.log(err.message)
+        return res.status(400).json({ message: "bad-request", data: err.message })
+    })
 }

@@ -47,12 +47,9 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
 
-    let mgtool = 0
-    let mgclock = 0
+    let finalmg = 0;
 
     const toolsequip = await gettoolsequip(id)
-
-    mgtool = checkmgtools(toolsequip, `${cosmeticequip.name || ""}${cosmeticequip.type || ""}`)
 
     const clocksequip = await getclockequip(id)
 
@@ -60,8 +57,6 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({message: "bad-request"})
     }
 
-    mgclock = checkmgclock(clocksequip.type || 0, pooldeets.subscription)
-    let finalmg = mgtool + mgclock
     let monstercoin = mcmined(toolsequip, clocksequip.type)
 
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip.type))

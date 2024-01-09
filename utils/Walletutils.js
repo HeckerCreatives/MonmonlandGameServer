@@ -374,7 +374,10 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype) => {
 exports.addwalletamount = async (id, wallettype, amount) => {
     return await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
     .then(() => "success")
-    .catch(() => "bad-request")
+    .catch(err => {
+        console.log(err.message)
+        return "bad-request"
+    })
 }
 
 function getmgunilevelpercentage(level){
