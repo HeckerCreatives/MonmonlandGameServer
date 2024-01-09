@@ -61,13 +61,10 @@ exports.playgame = async (req, res) => {
     }
 
     mgclock = checkmgclock(clocksequip.type || 0, pooldeets.subscription)
-
     let finalmg = mgtool + mgclock
-    let monstercoin = mcmined(toolsequip.type, clocksequip.type)
+    let monstercoin = mcmined(toolsequip, clocksequip.type)
 
-    const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip.type)
-    )
-
+    const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip.type))
     
     //  Check energy
     const energyamount = await Energy.findOne({owner: new mongoose.Types.ObjectId(id)})
@@ -230,8 +227,8 @@ exports.claimgame = async (req, res) => {
 
     await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, {status: "pending", timestarted: 0, unixtime: 0, harvestmc: 0, harvestmg: 0, harvestap: 0})
     .then(async () => {
-        const mcadd = await addwalletamount(id, "balance", totalMCFarmed)
-        const mgadd = await addwalletamount(id, "monstergemfarm", totalMCFarmed)
+        const mcadd = await addwalletamount(id, "monstercoin", totalMCFarmed)
+        const mgadd = await addwalletamount(id, "monstergemfarm", totalMGFarmed)
 
         const endexpirationtime = UnixtimeToDateTime(DateTimeServer() > game.unixtime ? game.unixtime : DateTimeServer())
         const startgrindtime = UnixtimeToDateTime(game.timestarted);

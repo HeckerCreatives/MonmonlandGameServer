@@ -6,7 +6,7 @@ const Gameactivity = require("../modelweb/Gameactivity")
 
 exports.checkmgtools = (tooltype, cosmetics) => {
     let mgamount = 0;
-
+    
     if (cosmetics == "Diamondring"){
         switch(tooltype) {
             case "2":
@@ -111,6 +111,8 @@ exports.mcmined = (toolstype, clocktype) => {
             amount = mcamount
             break;
     }
+
+    console.log(amount, mcamount, toolstype)
 
     return amount
 }
