@@ -31,5 +31,8 @@ exports.getpooldetails = async (id) => {
 
         return data
     })
-    .catch(() => "bad-request")
+    .catch(err => {
+        console.log(err.message)
+        return "bad-request"
+    })
 }

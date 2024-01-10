@@ -112,8 +112,6 @@ exports.mcmined = (toolstype, clocktype) => {
             break;
     }
 
-    console.log(amount, mcamount, toolstype)
-
     return amount
 }
 
@@ -267,7 +265,7 @@ exports.getfarm = (timestarted, unixtime, maxtotal) => {
     const currentTimeBetween = Math.min(currentTime - startTime, totalFarmingDuration); // Consider current time up to expiration
 
     // Calculate total coins farmed
-    const totalCoinsFarmed = Math.min((currentTimeBetween / 3600 * coinsPerHour).toFixed(2), maxTotalCoins);
+    const totalCoinsFarmed = Math.min((currentTimeBetween / 3600 * coinsPerHour), maxTotalCoins);
 
     return totalCoinsFarmed
 }

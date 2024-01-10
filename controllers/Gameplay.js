@@ -47,12 +47,9 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
 
-    let mgtool = 0
-    let mgclock = 0
+    let finalmg = 0;
 
     const toolsequip = await gettoolsequip(id)
-
-    mgtool = checkmgtools(toolsequip, `${cosmeticequip.name || ""}${cosmeticequip.type || ""}`)
 
     const clocksequip = await getclockequip(id)
 
@@ -60,8 +57,6 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({message: "bad-request"})
     }
 
-    mgclock = checkmgclock(clocksequip.type || 0, pooldeets.subscription)
-    let finalmg = mgtool + mgclock
     let monstercoin = mcmined(toolsequip, clocksequip.type)
 
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip.type))
@@ -223,7 +218,7 @@ exports.claimgame = async (req, res) => {
         }
     }
 
-    await 
+    // await 
 
     await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, {status: "pending", timestarted: 0, unixtime: 0, harvestmc: 0, harvestmg: 0, harvestap: 0})
     .then(async () => {
@@ -246,7 +241,7 @@ exports.claimgame = async (req, res) => {
             return res.status(400).json({ message: "bad-request" })
         }
 
-        res.json({message: "success"})
+        res.json({message: "success", mcfarmed: totalMCFarmed, mgfarmed: totalMGFarmed})
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }
