@@ -65,7 +65,7 @@ exports.getclocksamount = (clockstype) => {
 
     switch(clockstype){
         case "1":
-            clocksamount = 10
+            clocksamount = 20
             break;
         case "2":
             clocksamount = 35
