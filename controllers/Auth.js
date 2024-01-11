@@ -17,10 +17,14 @@ exports.authlogin = async (req, res) => {
 
     const { username, password, version } = req.query
 
+    if (process.env.maintenancefullgame == "1"){
+        return res.json({message: "maintenance"})
+    }
+
     if (version != process.env.gameversion){
         return res.json({message: "newupdate"})
     }
-    
+
     Gameusers.findOne({ username: username })
     .then(async user => {
         if (user && (await user.matchPassword(password))){
