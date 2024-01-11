@@ -108,7 +108,7 @@ exports.claimdaily = async (req, res) => {
         .then(async () => {
             const mc = await addwalletamount(id, "monstercoin", data.rewardsmc)
             const tp = await addpointswalletamount(id, "taskpoints", data.taskpoints)
-            const addlbpoints = await setleaderboard(id, totalMCFarmed)
+            const addlbpoints = await setleaderboard(id, data.taskpoints)
 
             if (mc != "success"){
                 return res.status(400).json({message: "bad-request"})

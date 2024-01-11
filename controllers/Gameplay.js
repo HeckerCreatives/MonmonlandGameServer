@@ -57,7 +57,7 @@ exports.playgame = async (req, res) => {
 
     const toolsequip = await gettoolsequip(id)
 
-    mgtool = checkmgtools(toolsequip, `${cosmeticequip.name || ""}${cosmeticequip.type || ""}`)
+    mgtool = checkmgtools(toolsequip, `${cosmeticequip.name == "" ? "" : cosmeticequip.name}${cosmeticequip.type == "" ? "" : cosmeticequip.type }`)
 
     const clocksequip = await getclockequip(id)
 
