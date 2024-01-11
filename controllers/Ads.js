@@ -12,7 +12,7 @@ exports.claimads = async (req, res) => {
         let itemname = ""
         let itemtype = ""
         const qty = 1
-
+        
         switch(adstype){
             case "1":
                 itemname = "1"
@@ -25,6 +25,7 @@ exports.claimads = async (req, res) => {
             case "3":
                 itemname = "3"
                 itemtype = "energy"
+                break;
             default:
                 return res.json({message: "noenergyitem"});
         }
