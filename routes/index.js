@@ -12,6 +12,7 @@ const routers = app => {
     app.use("/subscriptionshop", require("./Subscription"))
     app.use("/gameplay", require("./Gameplay"))
     app.use("/dailyactivities", require("./Dailyactivities"))
+    app.use("/gameannouncement", require("./Gameannouncement"))
 }
 
 module.exports = routers
