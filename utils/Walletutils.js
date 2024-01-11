@@ -173,7 +173,8 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
             },
         ];
         
-        const unilevelresult = await Gameusers.aggregate(pipeline);
+        const unilevelresult = await Gameusers.aggregate(pipeline)
+        .catch(err => console.log(err.message));
 
         const historypipeline = []
 
@@ -197,9 +198,10 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
         }))
         
         //  DIRECT POINTS
-        if (directreferralid != MONMONLAND_ID && directreferralid != ""){
+        if (directreferralid != process.env.MONMONLAND_ID && directreferralid != ""){
 
             let pointsamount = 0;
+
             switch(substype){
                 case "Pearl":
                     pointsamount = 0

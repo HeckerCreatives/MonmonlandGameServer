@@ -73,7 +73,8 @@ exports.buysubscription = async (req, res) => {
                             then: "Active",
                             else: "Inactive"
                         }
-                    }
+                    },
+                    rank: "none"
                 }
             }
         ])
