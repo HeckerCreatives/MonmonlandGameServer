@@ -99,7 +99,8 @@ exports.playgame = async (req, res) => {
         finalmg = addtotalmc.mgtobeadded
     }
 
-    await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, { status: "playing", timestarted: DateTimeServer(), unixtime: expiredtime, harvestmc: monstercoin, harvestmg: finalmg})
+
+    await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, { status: "playing", timestarted: DateTimeServer(), unixtime: expiredtime, harvestmc: monstercoin, harvestmg: finalmg, harvestap: monstercoin})
     .then(async data => {
 
         await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
@@ -235,6 +236,7 @@ exports.claimgame = async (req, res) => {
     .then(async () => {
         const mcadd = await addwalletamount(id, "monstercoin", totalMCFarmed)
         const mgadd = await addwalletamount(id, "monstergemfarm", totalMGFarmed)
+        const apadd = await addwalletamount(id, "activitypoints", totalMCFarmed)
 
         const endexpirationtime = UnixtimeToDateTime(DateTimeServer() > game.unixtime ? game.unixtime : DateTimeServer())
         const startgrindtime = UnixtimeToDateTime(game.timestarted);
@@ -249,6 +251,10 @@ exports.claimgame = async (req, res) => {
         }
 
         if (mgadd != "success"){
+            return res.status(400).json({ message: "bad-request" })
+        }
+
+        if (apadd != "success"){
             return res.status(400).json({ message: "bad-request" })
         }
 

@@ -105,7 +105,7 @@ exports.buyclocks = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
 
-    const sendcoms = await sendmgtounilevel(clocksamount, id, "Clocks Unilevel")
+    const sendcoms = await sendmgtounilevel(clocksamount, id, "Clocks Unilevel", clockstype, "merchandise")
 
     if (sendcoms == "success"){
         const time = DateTimeServerExpiration(30)

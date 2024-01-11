@@ -1,6 +1,7 @@
 const { default: mongoose } = require("mongoose")
 const Gamewallet = require("../models/Wallets")
 const Gameusers = require("../models/Gameusers")
+const Walletscutoff = require("../models/Walletscutoff")
 const Wallethistory = require("../models/Wallethistory")
 
 exports.checkwalletamount = async (amount, id) => {
@@ -57,7 +58,7 @@ exports.checkmcwalletamount = async (amount, id) => {
     .catch(err => "bad-request")
 }
 
-exports.sendcommissiontounilevel = async(commissionAmount, id) => {
+exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
     let response = ""
     await Gameusers.findOne({_id: id})
     .then(async sender => {
@@ -164,6 +165,7 @@ exports.sendcommissiontounilevel = async(commissionAmount, id) => {
             {
                 $group: {
                     _id: '$_id',
+                    level: {$first: '$level'},
                     amount: { $sum: '$originalCommissionPercentage' },
                 },
             },
@@ -173,8 +175,14 @@ exports.sendcommissiontounilevel = async(commissionAmount, id) => {
 
         const historypipeline = []
 
+        let directreferralid = ""
+
         unilevelresult.forEach(dataresult => {
-            const { _id, amount } = dataresult
+            const { _id, level, amount } = dataresult
+
+            if (level == 0){
+                directreferralid = _id
+            }
 
             historypipeline.push({owner: new mongoose.Types.ObjectId(_id), type: "Subscription Unilevel", description: "Subscription Unilevel", amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
         })
@@ -186,6 +194,44 @@ exports.sendcommissiontounilevel = async(commissionAmount, id) => {
             }
         }))
         
+        //  DIRECT POINTS
+        if (directreferralid != MONMONLAND_ID && directreferralid != ""){
+
+            let pointsamount = 0;
+            switch(substype){
+                case "Pearl":
+                    pointsamount = 0
+                    break;
+                case "Ruby":
+                    pointsamount = 1
+                    break;
+                case "Emerald":
+                    pointsamount = 3
+                    break;
+                case "Diamond":
+                    pointsamount = 5
+                    break;
+                default:
+                    pointsamount = 0
+                    break;
+            }
+
+            const addwallet = await exports.addwalletamount(directreferralid, "directpoints", pointsamount)
+            const adddrcutoff = await exports.addpointswalletamount(directreferralid, "directpoints", pointsamount) 
+
+            if (addwallet != "success"){
+                response = "bad-request"
+
+                return;
+            }
+
+            if (adddrcutoff != "success"){
+                response = "bad-request"
+
+                return;
+            }
+        }
+
         await Gamewallet.bulkWrite(bulkOperationUnilvl)
         .catch(() => response = "bad-request")
         await Wallethistory.insertMany(historypipeline)
@@ -200,7 +246,7 @@ exports.sendcommissiontounilevel = async(commissionAmount, id) => {
     return response;
 }
 
-exports.sendmgtounilevel = async(commissionAmount, id, historytype) => {
+exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemtype) => {
     let response = ""
     await Gameusers.findOne({_id: id})
     .then(async sender => {
@@ -312,6 +358,7 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype) => {
 
         let levelindex = 0;
         const bulkOperationUnilvl = []
+        const bulkOperationCutoffLvl = []
         const historypipeline = []
 
         for(var a = 0; a < Object.keys(unilevelmg).length; a++){
@@ -332,6 +379,22 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype) => {
                 }
                 else{
                     amount = commissionAmount * getmgunilevelpercentage(levelindex)
+                }
+
+                if (levelindex > 2){
+                    bulkOperationUnilvl.push({
+                        updateOne: {
+                            filter: { owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), wallettype: 'grouppoints' },
+                            update: { $inc: { amount: (getgrouppoints(itemtype, type) * (levelindex + 1))}}
+                        }
+                    })
+
+                    bulkOperationCutoffLvl.push({
+                        updateOne: {
+                            filter: { owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), wallettype: 'grouppoints' },
+                            update: { $inc: { amount: (getgrouppoints(itemtype, type) * (levelindex + 1))}}
+                        }
+                    })
                 }
 
                 bulkOperationUnilvl.push({
@@ -358,6 +421,12 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype) => {
             response = "bad-request"
             return
         })
+        await Walletscutoff.bulkWrite(bulkOperationCutoffLvl)
+        .catch((err) => {
+            console.log(err.message) 
+            response = "bad-request"
+            return
+        })
         await Wallethistory.insertMany(historypipeline)
         .catch(() => response = "bad-request")
 
@@ -372,9 +441,26 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype) => {
 }
 
 exports.addwalletamount = async (id, wallettype, amount) => {
-    console.log(amount)
     return await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
     .then(() => "success")
+    .catch(err => {
+        console.log(err.message, "addwallet amount failed")
+        return "bad-request"
+    })
+}
+
+exports.addpointswalletamount = async (id, wallettype, amount) => {
+    return await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
+    .then(() => {
+        Walletscutoff.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
+        .then(() => {
+            return "success"
+        })
+        .catch(err => {
+            console.log(err.message, "addwallet amount failed")
+            return "bad-request"
+        })
+    })
     .catch(err => {
         console.log(err.message, "addwallet amount failed")
         return "bad-request"
@@ -412,5 +498,35 @@ function getremainingmglevelpercentage(level){
             return 0.03
         case 5:
             return 0.01
+    }
+}
+
+function getgrouppoints(itemtype, type){
+    if (itemtype == "tools"){
+        switch(type){
+            case "2":
+                return 6;
+            case "3":
+                return 9;
+            case "4":
+                return 12
+            case "5":
+                return 18
+        }
+    }
+    else if (itemtype == "merchandise"){
+        switch(type){
+            case "2":
+                return 10;
+            case "3":
+                return 20;
+            case "4":
+                return 30
+            case "5":
+                return 60
+        }
+    }
+    else{
+        return 0
     }
 }

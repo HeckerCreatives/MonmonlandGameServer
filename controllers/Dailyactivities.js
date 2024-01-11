@@ -4,7 +4,7 @@ const Playtimegrinding = require("../models/Playtimegrinding")
 const Wallethistory = require("../models/Wallethistory")
 const { getavailabledailyactivities } = require("../utils/Dailyactivities")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
-const { addwalletamount } = require("../utils/Walletutils")
+const { addwalletamount, addpointswalletamount } = require("../utils/Walletutils")
 
 exports.getdailyactivities = async (req, res) => {
     const { id } = req.user
@@ -106,8 +106,13 @@ exports.claimdaily = async (req, res) => {
         await Dailyactivities.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: type, status: "not-claimed"}, {status: "claimed"})
         .then(async () => {
             const mc = await addwalletamount(id, "monstercoin", data.rewardsmc)
+            const tp = await addpointswalletamount(id, "taskpoints", data.taskpoints)
 
             if (mc != "success"){
+                return res.status(400).json({message: "bad-request"})
+            }
+
+            if (tp != "success"){
                 return res.status(400).json({message: "bad-request"})
             }
             

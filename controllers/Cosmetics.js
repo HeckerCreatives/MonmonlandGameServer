@@ -102,7 +102,7 @@ exports.buycosmetics = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
 
-    const sendcoms = await sendmgtounilevel(cosmeticsamount, id, "Cosmetics Unilevel")
+    const sendcoms = await sendmgtounilevel(cosmeticsamount, id, "Cosmetics Unilevel", `${itemname}${itemtype}`, "cosmetics")
 
     if (sendcoms == "success"){
         const time = DateTimeServerExpiration(30)
