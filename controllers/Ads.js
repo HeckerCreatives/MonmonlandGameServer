@@ -1,6 +1,8 @@
 const EnergyInventory = require("../models/Energyinventory")
 const { addpointswalletamount } = require("../utils/Walletutils")
 const { setleaderboard } = require("../utils/Leaderboards")
+const { default: mongoose } = require("mongoose")
+const { checkenergyinventoryconsumable } = require("../utils/Energyutils")
 
 exports.claimads = async (req, res) => {
     const { id } = req.user
@@ -27,8 +29,9 @@ exports.claimads = async (req, res) => {
                 return res.json({message: "noenergyitem"});
         }
 
-        const grantwalletpoints = addpointswalletamount(id, "adspoints", 1)
+        const grantwalletpoints = await addpointswalletamount(id, "adspoints", 1)
         const grantlbpoints = await setleaderboard(id, 1)
+
 
         if (grantwalletpoints != "success"){
             return res.status(400).json({ message: "bad-request" })
