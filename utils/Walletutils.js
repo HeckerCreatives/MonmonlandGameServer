@@ -415,8 +415,19 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
             }
         }
 
+        
         await Gamewallet.bulkWrite(bulkOperationUnilvl)
         .catch((err) => {
+            console.log(err.message) 
+            response = "bad-request"
+            return
+        })
+        await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: "purchasepoints"}, {$inc: {amount: getgrouppoints(itemtype, type)}}).catch((err) => {
+            console.log(err.message) 
+            response = "bad-request"
+            return
+        })
+        await Walletscutoff.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: "purchasepoints"}, {$inc: {amount: getgrouppoints(itemtype, type)}}).catch((err) => {
             console.log(err.message) 
             response = "bad-request"
             return
