@@ -73,6 +73,10 @@ exports.equipcosmetics = async (req, res) => {
 exports.buycosmetics = async (req, res) => {
     const { id } = req.user
     const { cosmeticstype, itemname, itemtype } = req.body
+    
+    if (process.env.maintenanceitems == "1") {
+        return res.json({message: "maintenance"})
+    }
 
     if (cosmeticstype != "Rubyring" && cosmeticstype != "Emeraldring" && cosmeticstype != "Diamondring" && cosmeticstype != "Energyring"){
         return res.json({message: "cosmeticsnotexist"})

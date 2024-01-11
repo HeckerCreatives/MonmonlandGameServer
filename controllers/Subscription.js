@@ -8,6 +8,10 @@ exports.buysubscription = async (req, res) => {
     const { id } = req.user
     const { substype } = req.body
 
+    if (process.env.maintenancesubscription = "1"){
+        return res.json({message: "maintenance"})
+    }
+
     if (substype != "Ruby" && substype != "Emerald" && substype != "Diamond"){
         return res.json({message: "subsnotexist"})
     }

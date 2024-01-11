@@ -121,6 +121,10 @@ exports.useenergyinventory = async (req, res) => {
 exports.buyenergyinventory = async (req, res) => {
     const { id } = req.user
     const { itemname, itemtype, qty } = req.body
+    
+    if (process.env.maintenanceitems == "1") {
+        return res.json({message: "maintenance"})
+    }
 
     const energyprice = checkenergyinventoryprice(`${itemname}${itemtype}`)
 

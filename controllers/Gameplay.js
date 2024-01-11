@@ -14,6 +14,10 @@ exports.playgame = async (req, res) => {
     const { id } = req.user
     const { gametype } = req.body
 
+    if (process.env.maintenancegrinding == "1"){
+        return res.json({message: "maintenance"})
+    }
+
     const pooldeets = await getpooldetails(id)
 
     if (pooldeets == "erroraccount"){
@@ -47,9 +51,12 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
 
-    let finalmg = 0;
+    let mgtool = 0
+    let mgclock = 0
 
     const toolsequip = await gettoolsequip(id)
+
+    mgtool = checkmgtools(toolsequip, `${cosmeticequip.name || ""}${cosmeticequip.type || ""}`)
 
     const clocksequip = await getclockequip(id)
 
@@ -57,6 +64,8 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({message: "bad-request"})
     }
 
+    mgclock = checkmgclock(clocksequip.type || 0, pooldeets.subscription)
+    let finalmg = mgtool + mgclock
     let monstercoin = mcmined(toolsequip, clocksequip.type)
 
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip.type))
@@ -183,6 +192,10 @@ exports.claimgame = async (req, res) => {
     const { id } = req.user
     const { gametype } = req.body
 
+    if (process.env.maintenancegrinding == "1"){
+        return res.json({message: "maintenance"})
+    }
+
     const game = await Ingamegames.findOne({owner: new mongoose.Types.ObjectId(id), type: gametype})
     .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
@@ -218,8 +231,6 @@ exports.claimgame = async (req, res) => {
         }
     }
 
-    // await 
-
     await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, {status: "pending", timestarted: 0, unixtime: 0, harvestmc: 0, harvestmg: 0, harvestap: 0})
     .then(async () => {
         const mcadd = await addwalletamount(id, "monstercoin", totalMCFarmed)
@@ -241,7 +252,7 @@ exports.claimgame = async (req, res) => {
             return res.status(400).json({ message: "bad-request" })
         }
 
-        res.json({message: "success", mcfarmed: totalMCFarmed, mgfarmed: totalMGFarmed})
+        res.json({message: "success"})
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }

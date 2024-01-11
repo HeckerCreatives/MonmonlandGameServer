@@ -76,6 +76,10 @@ exports.equiptools = async (req, res) => {
 exports.buytools = async (req, res) => {
     const { id } = req.user
     const { toolstype } = req.body
+    
+    if (process.env.maintenanceitems == "1") {
+        return res.json({message: "maintenance"})
+    }
 
     if (toolstype != "2" && toolstype != "3" && toolstype != "4" && toolstype != "5"){
         return res.json({message: "toolsnotexist"})

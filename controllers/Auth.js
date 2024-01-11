@@ -15,8 +15,12 @@ const encrypt = async password => {
 
 exports.authlogin = async (req, res) => {
 
-    const { username, password } = req.query
+    const { username, password, version } = req.query
 
+    if (version != process.env.gameversion){
+        return res.json({message: "newupdate"})
+    }
+    
     Gameusers.findOne({ username: username })
     .then(async user => {
         if (user && (await user.matchPassword(password))){

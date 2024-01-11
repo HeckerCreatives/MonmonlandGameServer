@@ -77,6 +77,10 @@ exports.buyclocks = async (req, res) => {
     const { id } = req.user
     const { clockstype } = req.body
 
+    if (process.env.maintenanceitems == "1") {
+        return res.json({message: "maintenance"})
+    }
+
     if (clockstype != "1" && clockstype != "2" && clockstype != "3" && clockstype != "4"){
         return res.json({message: "clocksnotexist"})
     }
