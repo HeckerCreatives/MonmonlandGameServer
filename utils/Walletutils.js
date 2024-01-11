@@ -220,7 +220,7 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
 
             const addwallet = await exports.addwalletamount(directreferralid, "directpoints", pointsamount)
             const adddrcutoff = await exports.addpointswalletamount(directreferralid, "directpoints", pointsamount) 
-            const addleaderboard = await setleaderboard(id, pointsamount)
+            const addleaderboard = await setleaderboard(directreferralid, pointsamount)
 
             if (addwallet != "success"){
                 response = "bad-request"
