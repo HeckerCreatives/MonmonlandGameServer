@@ -3,6 +3,8 @@ const Gamewallet = require("../models/Wallets")
 const Gameusers = require("../models/Gameusers")
 const Walletscutoff = require("../models/Walletscutoff")
 const Wallethistory = require("../models/Wallethistory")
+const Ingameleaderboard = require("../models/Leaderboard")
+const { setleaderboard } = require("../utils/Leaderboards")
 
 exports.checkwalletamount = async (amount, id) => {
     return await Gamewallet.findOne({owner: new mongoose.Types.ObjectId(id), wallettype: "balance"})
@@ -218,6 +220,7 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
 
             const addwallet = await exports.addwalletamount(directreferralid, "directpoints", pointsamount)
             const adddrcutoff = await exports.addpointswalletamount(directreferralid, "directpoints", pointsamount) 
+            const addleaderboard = await setleaderboard(id, pointsamount)
 
             if (addwallet != "success"){
                 response = "bad-request"
@@ -226,6 +229,12 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
             }
 
             if (adddrcutoff != "success"){
+                response = "bad-request"
+
+                return;
+            }
+
+            if (addleaderboard != "success"){
                 response = "bad-request"
 
                 return;
@@ -422,6 +431,14 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
             response = "bad-request"
             return
         })
+
+        //  POINTS
+        const addlbpoints = await setleaderboard(id, getgrouppoints(itemtype, type))
+
+        if (addlbpoints != "success"){
+            return res.json({message: "bad-request"})
+        }
+        
         await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: "purchasepoints"}, {$inc: {amount: getgrouppoints(itemtype, type)}}).catch((err) => {
             console.log(err.message) 
             response = "bad-request"
@@ -438,6 +455,8 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
             response = "bad-request"
             return
         })
+
+
         await Wallethistory.insertMany(historypipeline)
         .catch(() => response = "bad-request")
 
@@ -527,13 +546,13 @@ function getgrouppoints(itemtype, type){
     }
     else if (itemtype == "merchandise"){
         switch(type){
-            case "2":
+            case "1":
                 return 10;
-            case "3":
+            case "2":
                 return 20;
-            case "4":
+            case "3":
                 return 30
-            case "5":
+            case "4":
                 return 60
         }
     }

@@ -5,6 +5,7 @@ const Wallethistory = require("../models/Wallethistory")
 const { getavailabledailyactivities } = require("../utils/Dailyactivities")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
 const { addwalletamount, addpointswalletamount } = require("../utils/Walletutils")
+const { setleaderboard } = require("../utils/Leaderboards")
 
 exports.getdailyactivities = async (req, res) => {
     const { id } = req.user
@@ -107,6 +108,7 @@ exports.claimdaily = async (req, res) => {
         .then(async () => {
             const mc = await addwalletamount(id, "monstercoin", data.rewardsmc)
             const tp = await addpointswalletamount(id, "taskpoints", data.taskpoints)
+            const addlbpoints = await setleaderboard(id, totalMCFarmed)
 
             if (mc != "success"){
                 return res.status(400).json({message: "bad-request"})
@@ -114,6 +116,10 @@ exports.claimdaily = async (req, res) => {
 
             if (tp != "success"){
                 return res.status(400).json({message: "bad-request"})
+            }
+
+            if (addlbpoints != "success"){
+                return res.status(400).json({ message: "bad-request" })
             }
             
             res.json({message: "success"})

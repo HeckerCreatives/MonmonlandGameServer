@@ -9,6 +9,7 @@ const { getpooldetails } = require("../utils/Pooldetailsutils")
 const { DateTimeGameExpiration, DateTimeServer, CalculateSecondsBetween, UnixtimeToDateTime } = require("../utils/Datetimetools")
 const { addwalletamount } = require("../utils/Walletutils")
 const { default: mongoose } = require("mongoose")
+const { setleaderboard } = require("../utils/Leaderboards")
 
 exports.playgame = async (req, res) => {
     const { id } = req.user
@@ -237,6 +238,7 @@ exports.claimgame = async (req, res) => {
         const mcadd = await addwalletamount(id, "monstercoin", totalMCFarmed)
         const mgadd = await addwalletamount(id, "monstergemfarm", totalMGFarmed)
         const apadd = await addwalletamount(id, "activitypoints", totalMCFarmed)
+        const addlbpoints = await setleaderboard(id, totalMCFarmed)
 
         const endexpirationtime = UnixtimeToDateTime(DateTimeServer() > game.unixtime ? game.unixtime : DateTimeServer())
         const startgrindtime = UnixtimeToDateTime(game.timestarted);
@@ -255,6 +257,10 @@ exports.claimgame = async (req, res) => {
         }
 
         if (apadd != "success"){
+            return res.status(400).json({ message: "bad-request" })
+        }
+
+        if (addlbpoints != "success"){
             return res.status(400).json({ message: "bad-request" })
         }
 
