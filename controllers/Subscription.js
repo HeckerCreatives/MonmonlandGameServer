@@ -55,6 +55,8 @@ exports.buysubscription = async (req, res) => {
     }
 
     const sendcoms = await sendcommissiontounilevel(finalsubsamount, id, substype);
+
+    console.log(sendcoms)
     
     if (sendcoms == "bad-request"){
         return res.status(400).json({ message: "bad-request" })

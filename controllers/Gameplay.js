@@ -7,7 +7,7 @@ const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Co
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
 const { DateTimeGameExpiration, DateTimeServer, CalculateSecondsBetween, UnixtimeToDateTime } = require("../utils/Datetimetools")
-const { addwalletamount } = require("../utils/Walletutils")
+const { addwalletamount, addpointswalletamount } = require("../utils/Walletutils")
 const { default: mongoose } = require("mongoose")
 const { setleaderboard } = require("../utils/Leaderboards")
 
@@ -237,7 +237,7 @@ exports.claimgame = async (req, res) => {
     .then(async () => {
         const mcadd = await addwalletamount(id, "monstercoin", totalMCFarmed)
         const mgadd = await addwalletamount(id, "monstergemfarm", totalMGFarmed)
-        const apadd = await addwalletamount(id, "activitypoints", totalMCFarmed)
+        const apadd = await addpointswalletamount(id, "activitypoints", totalMCFarmed)
         const addlbpoints = await setleaderboard(id, totalMCFarmed)
 
         const endexpirationtime = UnixtimeToDateTime(DateTimeServer() > game.unixtime ? game.unixtime : DateTimeServer())

@@ -196,7 +196,7 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
                 update: { $inc: { amount: amount}}
             }
         }))
-        
+
         //  DIRECT POINTS
         if (directreferralid != process.env.MONMONLAND_ID && directreferralid != ""){
 
@@ -244,9 +244,15 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
         }
 
         await Gamewallet.bulkWrite(bulkOperationUnilvl)
-        .catch(() => response = "bad-request")
+        .catch(err => {
+            console.log(err.message)
+            response = "bad-request"
+        })
         await Wallethistory.insertMany(historypipeline)
-        .catch(() => response = "bad-request")
+        .catch(err => {
+            console.log(err.message)
+            response = "bad-request"
+        })
 
         response = "success"
     })
@@ -483,8 +489,8 @@ exports.addwalletamount = async (id, wallettype, amount) => {
 
 exports.addpointswalletamount = async (id, wallettype, amount) => {
     return await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
-    .then(() => {
-        Walletscutoff.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
+    .then(async () => {
+        return await Walletscutoff.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
         .then(() => {
             return "success"
         })
