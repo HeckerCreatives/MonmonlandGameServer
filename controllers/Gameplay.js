@@ -65,11 +65,11 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({message: "bad-request"})
     }
 
-    mgclock = checkmgclock(clocksequip.type || 0, pooldeets.subscription)
+    mgclock = checkmgclock(clocksequip?.type == null ? 0 : clocksequip.type, pooldeets.subscription)
     let finalmg = mgtool + mgclock
-    let monstercoin = mcmined(toolsequip, clocksequip.type)
+    let monstercoin = mcmined(toolsequip, clocksequip?.type == null ? 0 : clocksequip.type)
 
-    const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip.type))
+    const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type))
     
     //  Check energy
     const energyamount = await Energy.findOne({owner: new mongoose.Types.ObjectId(id)})
@@ -80,7 +80,7 @@ exports.playgame = async (req, res) => {
         return res.json({message: "energynotexist"})
     }
 
-    const energyconsumption = clockhoursadd(clocksequip.type)
+    const energyconsumption = clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type)
 
     if (energyamount < energyconsumption){
         return res.json({message: "notenoughenergy"})
