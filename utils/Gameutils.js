@@ -29,16 +29,16 @@ exports.checkmgtools = (tooltype, cosmetics) => {
     else{
         switch(tooltype) {
             case "2":
-                mgamount = Math.random() * (0.35 - 0.20) + 0.20;
+                mgamount = 0.20;
                 break;
             case "3":
-                mgamount = Math.random() * (0.40 - 0.60) + 0.40;
+                mgamount = 0.40;
                 break;
             case "4":
-                mgamount = Math.random() * (0.55 - 0.75) + 0.55;
+                mgamount = 0.55;
                 break;
             case "5":
-                mgamount = Math.random() * (0.80 - 1) + 0.80;
+                mgamount = 0.80;
                 break;
             default:
                 mgamount = 0;
@@ -47,6 +47,17 @@ exports.checkmgtools = (tooltype, cosmetics) => {
     }
 
     return mgamount;
+}
+
+exports.getnumbergamespersubs = (substype) => {
+    const number = {
+        Pearl: 1,
+        Ruby: 3,
+        Emerald: 5,
+        Diamond: 7
+    }
+
+    return (number[substype] && number[substype][clocktype]) || number[substype].default || 0;
 }
 
 exports.checkmgclock = (clocktype, substype) => {

@@ -6,7 +6,7 @@ const CashouthistorySchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Gameusers"
         },
-        status: {
+        id: {
             type: String
         },
         amount: {

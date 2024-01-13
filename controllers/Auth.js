@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jsonwebtokenPromisified = require('jsonwebtoken-promisified');
 const path = require("path");
 const { DateTimeServer } = require("../utils/Datetimetools")
+const { checkmaintenance } = require("../utils/Maintenance")
 
 const privateKey = fs.readFileSync(path.resolve(__dirname, "../keygen/private-key.pem"), 'utf-8');
 
@@ -17,7 +18,9 @@ exports.authlogin = async (req, res) => {
 
     const { username, password, version } = req.query
 
-    if (process.env.maintenancefullgame == "1"){
+    const maintenance = await checkmaintenance("maintenancefullgame")
+
+    if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
 

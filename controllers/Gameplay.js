@@ -2,7 +2,7 @@ const Ingamegames = require("../models/Games")
 const Playtimegrinding = require("../models/Playtimegrinding")
 const Energy = require("../models/Energy")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
-const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm } = require("../utils/Gameutils")
+const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
@@ -10,12 +10,15 @@ const { DateTimeGameExpiration, DateTimeServer, CalculateSecondsBetween, Unixtim
 const { addwalletamount, addpointswalletamount } = require("../utils/Walletutils")
 const { default: mongoose } = require("mongoose")
 const { setleaderboard } = require("../utils/Leaderboards")
+const { checkmaintenance } = require("../utils/Maintenance")
 
 exports.playgame = async (req, res) => {
     const { id } = req.user
     const { gametype } = req.body
 
-    if (process.env.maintenancegrinding == "1"){
+    const maintenance = await checkmaintenance("maintenancegrinding")
+
+    if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
 
@@ -65,8 +68,28 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({message: "bad-request"})
     }
 
+    let timemultipliermg = 0;
+
+    switch(clocksequip?.type == null ? -1 : clocksequip?.type){
+        case "1":
+            timemultipliermg = 6
+            break;
+        case "2":
+            timemultipliermg = 9
+            break;
+        case "3":
+            timemultipliermg = 12
+            break;
+        case "4":
+            timemultipliermg = 15
+            break;
+        default:
+            timemultipliermg = -1
+            break;
+    }
+
     mgclock = checkmgclock(clocksequip?.type == null ? 0 : clocksequip.type, pooldeets.subscription)
-    let finalmg = mgtool + mgclock
+    let finalmg = ((mgtool + mgclock) / 24) * timemultipliermg;
     let monstercoin = mcmined(toolsequip, clocksequip?.type == null ? 0 : clocksequip.type)
 
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type))
@@ -194,7 +217,9 @@ exports.claimgame = async (req, res) => {
     const { id } = req.user
     const { gametype } = req.body
 
-    if (process.env.maintenancegrinding == "1"){
+    const maintenance = await checkmaintenance("maintenancegrinding")
+
+    if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
 

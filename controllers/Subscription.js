@@ -3,12 +3,15 @@ const { getsubsamount, getpooldetails } = require("../utils/Pooldetailsutils")
 const { computecomplan } = require("../webutils/Communityactivityutils")
 const Pooldetails = require("../models/Pooldetails")
 const { default: mongoose } = require("mongoose")
+const { checkmaintenance } = require("../utils/Maintenance")
 
 exports.buysubscription = async (req, res) => {
     const { id } = req.user
     const { substype } = req.body
 
-    if (process.env.maintenancesubscription == "1"){
+    const maintenance = await checkmaintenance("maintenancesubscription")
+
+    if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
 

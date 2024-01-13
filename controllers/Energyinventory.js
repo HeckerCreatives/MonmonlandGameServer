@@ -5,6 +5,7 @@ const Pooldetails = require("../models/Pooldetails")
 const { checkenergyringequip, checkequipring } = require("../utils/Cosmeticutils")
 const { checkmcwalletamount } = require("../utils/Walletutils")
 const { checkenergyinventoryprice, checkenergyinventoryconsumable } = require("../utils/Energyutils")
+const { checkmaintenance } = require("../utils/Maintenance")
 
 exports.getenergyinventory = (req, res) => {
     const { id } = req.user
@@ -122,7 +123,9 @@ exports.buyenergyinventory = async (req, res) => {
     const { id } = req.user
     const { itemname, itemtype, qty } = req.body
     
-    if (process.env.maintenanceitems == "1") {
+    const maintenance = await checkmaintenance("maintenanceitems")
+
+    if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
 

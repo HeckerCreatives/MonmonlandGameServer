@@ -13,7 +13,10 @@ const DailylimitSchema = new mongoose.Schema(
             type: Number,
             default: 0
         },
-        
+        accumulated: {
+            type: Number,
+            default: 0
+        }
     },
     {
         timestamps: true

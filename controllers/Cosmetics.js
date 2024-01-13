@@ -3,6 +3,7 @@ const Cosmetics = require("../models/Cosmetics")
 const { checkallcosmeticsexpiration, checkcosmeticexpiration, getcosmeticsamount } = require("../utils/Cosmeticutils")
 const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
+const { checkmaintenance } = require("../models/Maintenance")
 
 exports.getcosmetics = async (req, res) => {
     const { id } = req.user
@@ -74,7 +75,9 @@ exports.buycosmetics = async (req, res) => {
     const { id } = req.user
     const { cosmeticstype, itemname, itemtype } = req.body
     
-    if (process.env.maintenanceitems == "1") {
+    const maintenance = await checkmaintenance("maintenanceitems")
+
+    if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
 

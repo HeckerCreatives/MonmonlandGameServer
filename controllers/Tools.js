@@ -4,6 +4,7 @@ const { checktoolexpiration, checkalltoolsexpiration, gettoolsamount } = require
 const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 const { computemerchcomplan } = require("../webutils/Communityactivityutils")
+const { checkmaintenance } = require("../utils/Maintenance")
 
 exports.gettools = async (req, res) => {
     const { id } = req.user
@@ -77,7 +78,9 @@ exports.buytools = async (req, res) => {
     const { id } = req.user
     const { toolstype } = req.body
     
-    if (process.env.maintenanceitems == "1") {
+    const maintenance = await checkmaintenance("maintenanceitems")
+
+    if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
 
