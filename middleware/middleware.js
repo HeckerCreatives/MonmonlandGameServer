@@ -37,7 +37,7 @@ exports.protectplayer = async (req, res, next) => {
             return res.status(401).json({ message: 'maintenance' })
         }
 
-        if (maintenance = "bad-request"){
+        if (maintenance == "bad-request"){
             return res.status(401).json({ message: 'bad-request' })
         }
 
