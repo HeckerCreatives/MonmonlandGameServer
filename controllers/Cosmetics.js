@@ -4,6 +4,7 @@ const { checkallcosmeticsexpiration, checkcosmeticexpiration, getcosmeticsamount
 const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 const { checkmaintenance } = require("../models/Maintenance")
+const { computemerchcomplan } = require("../webutils/Communityactivityutils")
 
 exports.getcosmetics = async (req, res) => {
     const { id } = req.user
@@ -110,7 +111,14 @@ exports.buycosmetics = async (req, res) => {
     if (sendcoms == "success"){
         const time = DateTimeServerExpiration(30)
         await Cosmetics.create({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype, expiration: time, permanent: "nonpermanent", isequip: "0"})
-        .then(() => {
+        .then(async () => {
+
+            const complan = await computemerchcomplan(cosmeticsamount, "shop")
+
+            if (complan != "success"){
+                res.status(400).json({ message: "bad-request" })
+            }
+
             return res.json({message: "success"})
         })
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
