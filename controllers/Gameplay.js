@@ -238,22 +238,16 @@ exports.claimgame = async (req, res) => {
 
     const totalMCFarmed = getfarm(game.timestarted, game.unixtime, game.harvestmc)
     const totalMGFarmed = getfarm(game.timestarted, game.unixtime, game.harvestmg)
-
-    let finalap = 0;
+    const totalAPFarmed = getfarm(game.timestarted, game.unixtime, game.harvestap)
 
     if (totalMCFarmed < game.harvestmc){
         const tobeminus = game.harvestmc - totalMCFarmed
-
-        finalap = totalMCFarmed
 
         const minus = await minustototalcoins("Monster Coin", tobeminus)
 
         if (minus != "success"){
             return res.status(400).json({ message: "bad-request" })
         }
-    }
-    else{
-        finalap = game.harvestap
     }
 
     if (totalMGFarmed < game.harvestmg){
@@ -270,8 +264,8 @@ exports.claimgame = async (req, res) => {
     .then(async () => {
         const mcadd = await addwalletamount(id, "monstercoin", totalMCFarmed)
         const mgadd = await addwalletamount(id, "monstergemfarm", totalMGFarmed)
-        const apadd = await addpointswalletamount(id, "activitypoints", finalap)
-        const addlbpoints = await setleaderboard(id, finalap)
+        const apadd = await addpointswalletamount(id, "activitypoints", totalAPFarmed)
+        const addlbpoints = await setleaderboard(id, totalAPFarmed)
 
         const endexpirationtime = UnixtimeToDateTime(DateTimeServer() > game.unixtime ? game.unixtime : DateTimeServer())
         const startgrindtime = UnixtimeToDateTime(game.timestarted);
