@@ -93,7 +93,7 @@ exports.dashboardplayer = async (req, res) => {
     }
 
     const rank = await Leaderboard.countDocuments({amount: { $gte: playerlb.amount}})
-    .then(data => data + 1)
+    .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     data["rank"] = rank
