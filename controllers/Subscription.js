@@ -2,6 +2,7 @@ const { sendcommissiontounilevel, checkwalletamount } = require("../utils/Wallet
 const { getsubsamount, getpooldetails } = require("../utils/Pooldetailsutils")
 const { computecomplan } = require("../webutils/Communityactivityutils")
 const Pooldetails = require("../models/Pooldetails")
+const SubsAccumulated = require("../modelweb/SubsAccumulated")
 const { default: mongoose } = require("mongoose")
 const { checkmaintenance } = require("../utils/Maintenance")
 
@@ -58,8 +59,6 @@ exports.buysubscription = async (req, res) => {
     }
 
     const sendcoms = await sendcommissiontounilevel(finalsubsamount, id, substype);
-
-    console.log(sendcoms)
     
     if (sendcoms == "bad-request"){
         return res.status(400).json({ message: "bad-request" })
@@ -91,7 +90,11 @@ exports.buysubscription = async (req, res) => {
                 return res.status(400).json({ message: "bad-request" })
             }
 
-            return res.json({message: "success"})
+            await SubsAccumulated.findOneAndUpdate({subsname: substype.toLowerCase()}, {$inc: {amount: finalsubsamount}})
+            .then(() => {
+                return res.json({message: "success"})
+            })
+            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
         })
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
     }
