@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require("path");
 const publicKey = fs.readFileSync(path.resolve(__dirname, "../keygen/public-key.pem"), 'utf-8');
 const jsonwebtokenPromisified = require('jsonwebtoken-promisified');
-const Maintenance = require("../models/Maintenance")
+const { checkmaintenance } = require("../utils/Maintenance")
 
 
 const verifyJWT = async (token) => {
@@ -31,24 +31,14 @@ exports.protectplayer = async (req, res, next) => {
 
         const decodedToken = await verifyJWT(headerpart);
 
-        const maintenance = await Maintenance.findOne({type: "maintenancefullgame"})
-        .then(data => {
-            if (!data){
-                return "nomaintenance"
-            }
-    
-            return data.value
-        })
-        .catch(() => "bad-request")
-
-        console.log(maintenance)
+        const maintenance = await checkmaintenance("maintenancefullgame")
         
         if (maintenance == "1") {
             return res.status(401).json({ message: 'maintenance' })
         }
 
-        if (maintenance == "bad-request"){
-            return res.status(401).json({ message: 'nad-request' });
+        if (maintenance = "bad-request"){
+            return res.status(401).json({ message: 'bad-request' })
         }
 
         const userdata = await Gameusers.findOne({_id: decodedToken.id})
