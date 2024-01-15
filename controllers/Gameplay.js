@@ -110,6 +110,7 @@ exports.playgame = async (req, res) => {
     }
 
     const addtotalmc = await addtototalfarmmc(monstercoin, finalmg)
+    let finalap = monstercoin;
 
     if (addtotalmc.message != "success"){
         return res.json({message: "failed"})
@@ -124,7 +125,7 @@ exports.playgame = async (req, res) => {
     }
 
 
-    await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, { status: "playing", timestarted: DateTimeServer(), unixtime: expiredtime, harvestmc: monstercoin, harvestmg: finalmg, harvestap: monstercoin})
+    await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, { status: "playing", timestarted: DateTimeServer(), unixtime: expiredtime, harvestmc: monstercoin, harvestmg: finalmg, harvestap: finalap})
     .then(async data => {
 
         await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
@@ -238,14 +239,21 @@ exports.claimgame = async (req, res) => {
     const totalMCFarmed = getfarm(game.timestarted, game.unixtime, game.harvestmc)
     const totalMGFarmed = getfarm(game.timestarted, game.unixtime, game.harvestmg)
 
+    let finalap = 0;
+
     if (totalMCFarmed < game.harvestmc){
         const tobeminus = game.harvestmc - totalMCFarmed
+
+        finalap = totalMCFarmed
 
         const minus = await minustototalcoins("Monster Coin", tobeminus)
 
         if (minus != "success"){
             return res.status(400).json({ message: "bad-request" })
         }
+    }
+    else{
+        finalap = game.harvestap
     }
 
     if (totalMGFarmed < game.harvestmg){
@@ -262,8 +270,8 @@ exports.claimgame = async (req, res) => {
     .then(async () => {
         const mcadd = await addwalletamount(id, "monstercoin", totalMCFarmed)
         const mgadd = await addwalletamount(id, "monstergemfarm", totalMGFarmed)
-        const apadd = await addpointswalletamount(id, "activitypoints", totalMCFarmed)
-        const addlbpoints = await setleaderboard(id, totalMCFarmed)
+        const apadd = await addpointswalletamount(id, "activitypoints", finalap)
+        const addlbpoints = await setleaderboard(id, finalap)
 
         const endexpirationtime = UnixtimeToDateTime(DateTimeServer() > game.unixtime ? game.unixtime : DateTimeServer())
         const startgrindtime = UnixtimeToDateTime(game.timestarted);
