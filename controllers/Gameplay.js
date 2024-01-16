@@ -113,7 +113,7 @@ exports.playgame = async (req, res) => {
 
     const addtotalmc = await addtototalfarmmc(monstercoin, finalmg)
     let finalap = monstercoin;
-    
+
     if (addtotalmc.message != "success"){
         return res.json({message: "failed"})
     }
@@ -240,7 +240,7 @@ exports.claimgame = async (req, res) => {
 
     const totalMCFarmed = getfarm(game.timestarted, game.unixtime, game.harvestmc)
     const totalMGFarmed = getfarm(game.timestarted, game.unixtime, game.harvestmg)
-    const totalAPFarmed = getfarm(game.timestarted, game.unixtime, game.harvestap)
+    const totalAPFarmed = totalMCFarmed
 
     if (totalMCFarmed < game.harvestmc){
         const tobeminus = game.harvestmc - totalMCFarmed
