@@ -193,8 +193,6 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
         }
     })
 
-    console.log(maxamount + ads + investor + gameact, "asdjkf")
-
     maxamount += ((ads + investor + gameact) * 1000)
 
     const remainingSpace = maxamount - monmoncoins;
