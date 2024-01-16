@@ -1,7 +1,7 @@
 const Equipment = require("../models/Equipment")
 const { default: mongoose } = require("mongoose")
 const { checktoolexpiration, checkalltoolsexpiration, gettoolsamount } = require("../utils/Toolexpiration")
-const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
+const { sendmgtounilevel, checkwalletamount, rebatestowallet } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 const { computemerchcomplan } = require("../webutils/Communityactivityutils")
 const { checkmaintenance } = require("../utils/Maintenance")
@@ -115,8 +115,13 @@ exports.buytools = async (req, res) => {
         await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: toolstype}, {isowned: "1", expiration: time})
         .then(async () => {
             const complan = await computemerchcomplan(toolsamount, "tools")
+            const rebates = await rebatestowallet(id, "balance", toolsamount * 0.05, "Tools")
 
             if (complan != "success"){
+                res.status(400).json({ message: "bad-request" })
+            }
+
+            if (rebates != "success"){
                 res.status(400).json({ message: "bad-request" })
             }
             

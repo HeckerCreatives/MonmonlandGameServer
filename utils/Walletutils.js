@@ -487,6 +487,19 @@ exports.addwalletamount = async (id, wallettype, amount) => {
     })
 }
 
+exports.rebatestowallet = async (id, wallettype, amount, type) => {
+    return await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
+    .then(async () => {
+        return await Wallethistory.create({owner: new mongoose.Types.ObjectId(id), description: `${type} Rebate`, amount: amount, historystructure: `Rebates from ${type}`})
+        .then(() => "success")
+        .catch(() => "bad-request")
+    })
+    .catch(err => {
+        console.log(err.message, "addwallet amount failed")
+        return "bad-request"
+    })
+}
+
 exports.addpointswalletamount = async (id, wallettype, amount) => {
     return await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
     .then(async () => {
