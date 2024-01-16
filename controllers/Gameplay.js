@@ -2,7 +2,7 @@ const Ingamegames = require("../models/Games")
 const Playtimegrinding = require("../models/Playtimegrinding")
 const Energy = require("../models/Energy")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
-const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs } = require("../utils/Gameutils")
+const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
@@ -89,10 +89,8 @@ exports.playgame = async (req, res) => {
     }
 
     mgclock = checkmgclock(clocksequip?.type == null ? 0 : clocksequip.type, pooldeets.subscription)
-    let finalmg = (((mgtool + mgclock) / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription);
+    let finalmg = (((mgtool + mgclock + energyringmgvalue()) / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription);
     let monstercoin = mcmined(toolsequip, clocksequip?.type == null ? 0 : clocksequip.type)
-
-    console.log(monstercoin)
 
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type))
     

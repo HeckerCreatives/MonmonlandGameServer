@@ -7,7 +7,7 @@ const Gameactivity = require("../modelweb/Gameactivity")
 exports.checkmgtools = (tooltype, cosmetics) => {
     let mgamount = 0;
     
-    if (cosmetics == "Diamondring"){
+    if (cosmetics == "Diamondring" || cosmetics == "Energyring"){
         switch(tooltype) {
             case "2":
                 mgamount = 0.35;
@@ -47,6 +47,22 @@ exports.checkmgtools = (tooltype, cosmetics) => {
     }
 
     return mgamount;
+}
+
+exports.energyringmgvalue = (cosmetics) => {
+    const rand = Math.floor(Math.random() * (700 - 1 + 1)) + 1;
+
+    if (cosmetics == "Energyring"){
+        if (rand == 1){
+            return 0.5
+        }
+        else{
+            return 0
+        }
+    }
+    else{
+        return 0
+    }
 }
 
 exports.getnumbergamespersubs = (substype) => {
