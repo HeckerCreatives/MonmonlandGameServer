@@ -1,7 +1,7 @@
 const Clock = require("../models/Clock")
 const { default: mongoose } = require("mongoose")
 const { checkclockexpiration, checkallclockexpiration, getclocksamount } = require("../utils/Clockexpiration")
-const { sendmgtounilevel, checkwalletamountm, rebatestowallet } = require("../utils/Walletutils")
+const { sendmgtounilevel, checkwalletamount, rebatestowallet } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 const { computemerchcomplan } = require("../webutils/Communityactivityutils")
 const { checkmaintenance } = require("../utils/Maintenance")
