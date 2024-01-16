@@ -28,7 +28,7 @@ exports.authlogin = async (req, res) => {
         return res.json({message: "newupdate"})
     }
 
-    Gameusers.findOne({ username: username })
+    Gameusers.findOne({ username: { $regex: new RegExp(username, 'i') } })
     .then(async user => {
         if (user && (await user.matchPassword(password))){
             if (user.status != "active"){
