@@ -109,7 +109,7 @@ exports.playgame = async (req, res) => {
     const energyconsumption = clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type)
 
     if (cosmeticequip){
-        if (cosmeticequip.name != "Energy" && cosmeticequip.type != "ring"){
+        if (cosmeticequip.name != "Energy"){
             if (energyamount < energyconsumption){
                 return res.json({message: "notenoughenergy"})
             }
@@ -141,7 +141,7 @@ exports.playgame = async (req, res) => {
     .then(async data => {
 
         if (cosmeticequip){
-            if (cosmeticequip.name != "Energy" && cosmeticequip.type != "ring"){
+            if (cosmeticequip.name != "Energy"){
                 await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
                     $set: {
                         amount: {
