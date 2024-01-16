@@ -387,7 +387,24 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
 
             const ownedclocks = unilevelmg[a].clockdata == null ? false : unilevelmg[a].clockData.some(clockdata => clockdata.isowned == '1')
 
-            if (ownedtools || ownedclocks){
+            if (unilevelmg[a].owner == new mongoose.Types.ObjectId(process.env.MONMONLAND_ID)){
+                
+                let amount = 0;
+
+                amount = commissionAmount * getremainingmglevelpercentage(levelindex)
+
+                bulkOperationUnilvl.push({
+                    updateOne: {
+                        filter: { owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), wallettype: 'monstergemunilevel' },
+                        update: { $inc: { amount: amount}}
+                    }
+                })
+
+                historypipeline.push({owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), type: historytype, description: historytype, amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
+
+                break
+            }
+            else if (ownedtools || ownedclocks){
 
                 let amount = 0;
 
