@@ -57,7 +57,7 @@ exports.getnumbergamespersubs = (substype) => {
         Diamond: 7
     }
 
-    return (number[substype] && number[substype][clocktype]) || number[substype].default || 0;
+    return (number[substype] && number[substype]) || 0;
 }
 
 exports.checkmgclock = (clocktype, substype) => {

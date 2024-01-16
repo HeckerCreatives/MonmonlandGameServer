@@ -84,12 +84,12 @@ exports.playgame = async (req, res) => {
             timemultipliermg = 15
             break;
         default:
-            timemultipliermg = -1
+            timemultipliermg = 0
             break;
     }
 
     mgclock = checkmgclock(clocksequip?.type == null ? 0 : clocksequip.type, pooldeets.subscription)
-    let finalmg = ((mgtool + mgclock) / 24) * timemultipliermg;
+    let finalmg = (((mgtool + mgclock) / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription);
     let monstercoin = mcmined(toolsequip, clocksequip?.type == null ? 0 : clocksequip.type)
 
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type))
