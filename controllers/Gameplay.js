@@ -142,22 +142,6 @@ exports.playgame = async (req, res) => {
 
         if (cosmeticequip){
             if (cosmeticequip.name != "Energy" && cosmeticequip.type != "ring"){
-                if (energyamount < energyconsumption){
-                    await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
-                        $set: {
-                            amount: {
-                                $max: [0, {
-                                    $add: ["$amount", -energyconsumption]
-                                }]
-                            }
-                        }
-                    }])
-                    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
-                }
-            }
-        }
-        else{
-            if (energyamount < energyconsumption){
                 await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
                     $set: {
                         amount: {
@@ -169,6 +153,18 @@ exports.playgame = async (req, res) => {
                 }])
                 .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
             }
+        }
+        else{
+            await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
+                $set: {
+                    amount: {
+                        $max: [0, {
+                            $add: ["$amount", -energyconsumption]
+                        }]
+                    }
+                }
+            }])
+            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
         }
         
         return res.json({message: "success", mc: monstercoin, mg: finalmg, expiration: expiredtime, datetime: DateTimeServer()})
