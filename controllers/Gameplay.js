@@ -88,8 +88,16 @@ exports.playgame = async (req, res) => {
             break;
     }
 
+    let energyringmg = 0
+
+    if (cosmeticequip){
+        if (cosmeticequip.name == "Energy"){
+            energyringmg = ((0.30 / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription)
+        }
+    }
+
     mgclock = checkmgclock(clocksequip?.type == null ? 0 : clocksequip.type, pooldeets.subscription)
-    let finalmg = (((mgtool + mgclock + energyringmgvalue()) / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription);
+    let finalmg = (((mgtool + mgclock + energyringmg) / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription);
     let monstercoin = mcmined(toolsequip, clocksequip?.type == null ? 0 : clocksequip.type)
 
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type))
