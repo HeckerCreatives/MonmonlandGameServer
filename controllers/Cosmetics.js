@@ -113,7 +113,7 @@ exports.buycosmetics = async (req, res) => {
         await Cosmetics.create({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype, expiration: time, permanent: "nonpermanent", isequip: "0"})
         .then(async () => {
 
-            const complan = await computeshopcomplan(cosmeticsamount)
+            const complan = await computeshopcomplan(cosmeticsamount, "shop")
 
             if (complan != "success"){
                 res.status(400).json({ message: "bad-request" })

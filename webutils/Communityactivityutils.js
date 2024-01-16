@@ -1,4 +1,5 @@
 const { default: mongoose } = require("mongoose");
+const Merchandise = require("../modelweb/Merchandise")
 const Communityactivity = require("../modelweb/Communityactivity")
 
 exports.computecomplan = async (amount) => {
@@ -97,8 +98,14 @@ exports.computecomplan = async (amount) => {
     return response
 }
 
-exports.computemerchcomplan = async (amount) => {
+exports.computemerchcomplan = async (amount, itemtype) => {
     let response = ""
+
+    await Merchandise.findOneAndUpdate({item: itemtype}, {$inc: {amount: amount}})
+    .catch(() => {
+        response = "bad-request"
+        return
+    })
                 
     const complan = (amount * 0.22)
     const leaderboards = (amount * 0.03)
@@ -192,9 +199,15 @@ exports.computemerchcomplan = async (amount) => {
     return response
 }
 
-exports.computeshopcomplan = async (amount) => {
+exports.computeshopcomplan = async (amount, itemtype) => {
     let response = ""
-                
+
+    await Merchandise.findOneAndUpdate({item: itemtype}, {$inc: {amount: amount}})
+    .catch(() => {
+        response = "bad-request"
+        return
+    })
+
     const complan = (amount * 0.17)
     const leaderboards = (amount * 0.03)
     const grinding = (amount * 0.45)

@@ -115,7 +115,7 @@ exports.buyclocks = async (req, res) => {
         await Clock.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: clockstype}, {isowned: "1", expiration: time})
         .then(async () => {
 
-            const complan = await computemerchcomplan(clocksamount)
+            const complan = await computemerchcomplan(clocksamount, "clock")
             const rebates = await rebatestowallet(id, "balance", clocksamount * 0.05, "Clocks")
 
             if (complan != "success"){
