@@ -107,8 +107,17 @@ exports.playgame = async (req, res) => {
 
     const energyconsumption = clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type)
 
-    if (energyamount < energyconsumption){
-        return res.json({message: "notenoughenergy"})
+    if (cosmeticequip){
+        if (cosmeticequip.name != "Energy" && cosmeticequip.type != "ring"){
+            if (energyamount < energyconsumption){
+                return res.json({message: "notenoughenergy"})
+            }
+        }
+    }
+    else{
+        if (energyamount < energyconsumption){
+            return res.json({message: "notenoughenergy"})
+        }
     }
 
     const addtotalmc = await addtototalfarmmc(monstercoin, finalmg)
