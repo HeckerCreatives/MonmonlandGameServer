@@ -92,6 +92,8 @@ exports.playgame = async (req, res) => {
     let finalmg = (((mgtool + mgclock) / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription);
     let monstercoin = mcmined(toolsequip, clocksequip?.type == null ? 0 : clocksequip.type)
 
+    console.log(monstercoin)
+
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type))
     
     //  Check energy
@@ -111,7 +113,7 @@ exports.playgame = async (req, res) => {
 
     const addtotalmc = await addtototalfarmmc(monstercoin, finalmg)
     let finalap = monstercoin;
-
+    
     if (addtotalmc.message != "success"){
         return res.json({message: "failed"})
     }

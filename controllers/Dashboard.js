@@ -9,6 +9,7 @@ const Monmoncoin = require("../modelweb/Monmoncoin")
 const Investorfunds = require("../modelweb/Investorfunds")
 const Wallethistory = require("../models/Wallethistory")
 const { default: mongoose } = require("mongoose")
+const { DateTimeServer } = require("../utils/Datetimetools")
 
 exports.dashboardplayer = async (req, res) => {
     const { id } = req.user
@@ -67,7 +68,8 @@ exports.dashboardplayer = async (req, res) => {
     const grinding = communityactivity.filter(e => e.type == "grinding")
     const quest = communityactivity.filter(e => e.type == "quest")
 
-    const mclimit = grinding[0].amount + quest[0].amount + gameactivity.total + ads.amount + investors.amount
+    const mclimit = (grinding[0].amount + quest[0].amount + gameactivity.total + ads.amount + investors.amount) * 1000
+
     const mcvalue = mclimit / (totalmcval.amount == 0 ? 1 : totalmcval.amount)
 
     data["mcvalue"] = mcvalue
@@ -116,6 +118,7 @@ exports.dashboardplayer = async (req, res) => {
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     data["tools"] = !tools ? "0" : "1"
+    data["datetime"] = DateTimeServer()
 
     res.json({message: "success", data: data})
 }
