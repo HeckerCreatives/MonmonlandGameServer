@@ -139,7 +139,7 @@ exports.playgame = async (req, res) => {
         }])
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
         
-        return res.json({message: "success", mc: monstercoin, mg: finalmg, expiration: expiredtime})
+        return res.json({message: "success", mc: monstercoin, mg: finalmg, expiration: expiredtime, datetime: DateTimeServer()})
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }
@@ -291,7 +291,10 @@ exports.claimgame = async (req, res) => {
             return res.status(400).json({ message: "bad-request" })
         }
 
-        res.json({message: "success"})
+        finaldata = {
+            datetime: DateTimeServer()
+        }
+        res.json({message: "success", data: finaldata})
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }
