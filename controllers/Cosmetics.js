@@ -3,7 +3,7 @@ const Cosmetics = require("../models/Cosmetics")
 const { checkallcosmeticsexpiration, checkcosmeticexpiration, getcosmeticsamount } = require("../utils/Cosmeticutils")
 const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
-const { checkmaintenance } = require("../models/Maintenance")
+const { checkmaintenance } = require("../utils/Maintenance")
 const { computemerchcomplan } = require("../webutils/Communityactivityutils")
 
 exports.getcosmetics = async (req, res) => {
