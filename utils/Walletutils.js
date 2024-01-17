@@ -387,7 +387,7 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
 
             const ownedclocks = unilevelmg[a].clockdata == null ? false : unilevelmg[a].clockData.some(clockdata => clockdata.isowned == '1')
 
-            if (unilevelmg[a].owner == new mongoose.Types.ObjectId(process.env.MONMONLAND_ID)){
+            if (unilevelmg[a].owner == process.env.MONMONLAND_ID){
                 
                 let amount = 0;
 
@@ -401,8 +401,6 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
                 })
 
                 historypipeline.push({owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), type: historytype, description: historytype, amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
-
-                break
             }
             else if (ownedtools || ownedclocks){
 
