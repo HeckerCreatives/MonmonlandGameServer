@@ -194,5 +194,8 @@ exports.claimtask = async(req, res) => {
         return res.json({message: "tasknotexist"})
     }
 
+    await Task.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: tasktype}, {value: "1"})
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
+
     return res.json({message: "success"})
 }
