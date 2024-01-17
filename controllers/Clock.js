@@ -1,7 +1,7 @@
 const Clock = require("../models/Clock")
 const { default: mongoose } = require("mongoose")
 const { checkclockexpiration, checkallclockexpiration, getclocksamount } = require("../utils/Clockexpiration")
-const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
+const { sendmgtounilevel, checkwalletamount, rebatestowallet } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 const { computemerchcomplan } = require("../webutils/Communityactivityutils")
 const { checkmaintenance } = require("../utils/Maintenance")
@@ -116,8 +116,13 @@ exports.buyclocks = async (req, res) => {
         .then(async () => {
 
             const complan = await computemerchcomplan(clocksamount, "clock")
+            const rebates = await rebatestowallet(id, "balance", clocksamount * 0.05, "Clocks")
 
             if (complan != "success"){
+                res.status(400).json({ message: "bad-request" })
+            }
+
+            if (rebates != "success"){
                 res.status(400).json({ message: "bad-request" })
             }
             
