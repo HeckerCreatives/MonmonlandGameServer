@@ -180,7 +180,7 @@ exports.claimtask = async(req, res) => {
         }
     }
     else if (tasktype == "5"){
-        if (directinvite < 20){
+        if (directinvite < 50){
             return res.json({message: "requirementsnotmet"})
         }
 
