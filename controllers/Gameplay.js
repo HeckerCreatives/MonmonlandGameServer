@@ -331,3 +331,34 @@ exports.claimgame = async (req, res) => {
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }
+
+exports.playpalosebo = async (req, res) => {
+    const maintenance = await checkmaintenance("maintenancefiestagame")
+
+    if (maintenance == "1") {
+        return res.json({message: "maintenance"})
+    }
+
+    return res.json({message: "success"})
+}
+
+exports.playsupermonmon = async (req, res) => {
+    const maintenance = await checkmaintenance("maintenancefiestagame")
+
+    if (maintenance == "1") {
+        return res.json({message: "maintenance"})
+    }
+    
+    return res.json({message: "success"})
+}
+
+exports.playsponsor = async (req, res) => {
+    const maintenance = await checkmaintenance("maintenancesponsor")
+
+    if (maintenance == "1") {
+        return res.json({message: "maintenance"})
+    }
+
+    return res.json({message: "success"})
+    //  ADDITIONAL CODE HERE
+}
