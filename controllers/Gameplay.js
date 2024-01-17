@@ -104,11 +104,11 @@ exports.playgame = async (req, res) => {
     
     //  Check energy
     const energyamount = await Energy.findOne({owner: new mongoose.Types.ObjectId(id)})
-
     .then(data => data.amount)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     if (!energyamount){
+        console.log(energyamount)
         return res.json({message: "energynotexist"})
     }
 

@@ -22,6 +22,12 @@ const GameusersSchema = new mongoose.Schema(
         },
         webtoken: {
             type: String
+        },
+        bandate: {
+            type: String
+        },
+        banreason: {
+            type: String
         }
     },
     {
