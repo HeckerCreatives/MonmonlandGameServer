@@ -62,6 +62,9 @@ exports.useenergyinventory = async (req, res) => {
 
     switch(subslevel){
         case "Pearl":
+            finalmaxenergy = 10
+            break;
+        case "Ruby":
             finalmaxenergy = 20
             break;
         case "Emerald":
@@ -78,19 +81,18 @@ exports.useenergyinventory = async (req, res) => {
     finalmaxenergy += checkring
 
     EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), _id: new mongoose.Types.ObjectId(itemid)})
-    .then(async data => {
-        if (!data){
+    .then(async energyinventorydata => {
+        if (!energyinventorydata){
             return res.json({message: "notexist"})
         }
 
-        const newamount = data.amount - 1
-
+        const newamount = energyinventorydata.amount - 1
         //  Energy grant
         await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
             $set: {
                 amount: {
                     $min: [finalmaxenergy, {
-                        $add: ["$amount", data.consumableamount]
+                        $add: ["$amount", energyinventorydata.consumableamount]
                     }]
                 }
             }
