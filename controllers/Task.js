@@ -101,7 +101,7 @@ exports.claimtask = async(req, res) => {
     const ads = walletdata.filter(e => e.wallettype == "adspoints")
     const directinvite = walletdata.filter(e => e.wallettype == "directpoints")
     const fiestaparticipation = walletdata.filter(e => e.wallettype == "fiestaparticipation")
-    const sponsoraparticipation = walletdata.filter(e => e.wallettype == "sponsoraparticipation")
+    const sponsorparticipation = walletdata.filter(e => e.wallettype == "sponsorparticipation")
 
     if (tasktype == "1"){
         if (ads < 50){
@@ -130,7 +130,7 @@ exports.claimtask = async(req, res) => {
             return res.json({message: "requirementsnotmet"})
         }
 
-        if (sponsoraparticipation < 1){
+        if (sponsorparticipation < 1){
             return res.json({message: "requirementsnotmet"})
         }
 
