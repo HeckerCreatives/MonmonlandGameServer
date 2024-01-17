@@ -98,7 +98,7 @@ exports.claimtask = async(req, res) => {
         return res.json({message: "nowalletdata"})
     }
 
-    const ads = walletdata.filter(e => e.wallettype == "adspoins")
+    const ads = walletdata.filter(e => e.wallettype == "adspoints")
     const directinvite = walletdata.filter(e => e.wallettype == "directpoints")
     const fiestaparticipation = walletdata.filter(e => e.wallettype == "fiestaparticipation")
     const sponsoraparticipation = walletdata.filter(e => e.wallettype == "sponsoraparticipation")
