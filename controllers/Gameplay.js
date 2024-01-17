@@ -108,6 +108,7 @@ exports.playgame = async (req, res) => {
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     if (!energyamount){
+        console.log(id)
         console.log(energyamount)
         return res.json({message: "energynotexist"})
     }
