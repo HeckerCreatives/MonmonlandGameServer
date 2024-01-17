@@ -11,6 +11,7 @@ const { addwalletamount, addpointswalletamount } = require("../utils/Walletutils
 const { default: mongoose } = require("mongoose")
 const { setleaderboard } = require("../utils/Leaderboards")
 const { checkmaintenance } = require("../utils/Maintenance")
+const Gameunlock = require("../models/Gameunlock")
 
 exports.playgame = async (req, res) => {
     const { id } = req.user
@@ -242,7 +243,21 @@ exports.getgames = async (req, res) => {
             timestarted: timestarted,
             playtime: playtime
         }
-      })
+    })
+
+    const gameunlock = await Gameunlock.find({owner: new mongoose.Types.ObjectId(id), $or: [{type: "playall"}, {type: "claimall"}]})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    if (gameunlock.length <= 0){
+        data["claimall"] = "0"
+        data["playall"] = "0"
+    }
+    else{
+        gameunlock.forEach(unlockdata => {
+            data[unlockdata.type] = unlockdata.value
+        })
+    }
 
     return res.json({message: "success", data: data})
 }

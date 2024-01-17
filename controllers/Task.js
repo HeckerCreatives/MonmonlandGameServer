@@ -75,5 +75,14 @@ exports.claimtask = async(req, res) => {
         return res.json({message: "already claimed"})
     }
 
+    const walletdata = await Walletscutoff.find()
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    
+    if (walletdata.length <= 0){
+        return res.json({message: "nowalletdata"})
+    }
+
     
 }
