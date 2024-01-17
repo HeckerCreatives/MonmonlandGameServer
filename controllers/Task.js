@@ -166,7 +166,7 @@ exports.claimtask = async(req, res) => {
         }
     }
     else if (tasktype == "4"){
-        if (ads < 20){
+        if (ads < 10){
             return res.json({message: "requirementsnotmet"})
         }
 
