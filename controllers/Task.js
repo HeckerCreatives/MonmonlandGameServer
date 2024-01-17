@@ -1,7 +1,9 @@
 const { default: mongoose } = require("mongoose")
 const Walletscutoff = require("../models/Walletscutoff")
 const Task = require("../models/Task")
+const Gameunlock = require("../models/Gameunlock")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
+const { addwalletamount } = require("../utils/Walletutils")
 
 exports.gettaskdata = async(req, res) => {
     const { id } = req.user
@@ -75,6 +77,18 @@ exports.claimtask = async(req, res) => {
         return res.json({message: "already claimed"})
     }
 
+    const pooldetails = await getpooldetails(id)
+
+    if (pooldetails == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldetails == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+    else if (!pooldetails){
+        return res.json({message: "nodatapooldetails"})
+    }
+
     const walletdata = await Walletscutoff.find()
     .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
@@ -84,5 +98,101 @@ exports.claimtask = async(req, res) => {
         return res.json({message: "nowalletdata"})
     }
 
-    
+    const ads = walletdata.filter(e => e.wallettype == "adspoins")
+    const directinvite = walletdata.filter(e => e.wallettype == "directpoints")
+    const fiestaparticipation = walletdata.filter(e => e.wallettype == "fiestaparticipation")
+    const sponsoraparticipation = walletdata.filter(e => e.wallettype == "sponsoraparticipation")
+
+    if (tasktype == "1"){
+        if (ads < 50){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        if (fiestaparticipation < 50){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: "claimall", value: "1"})
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
+        
+        const addmc = await addwalletamount(id, "monstercoin", 200)
+
+        if (addmc != "success"){
+            return res.status(400).json({ message: "bad-request" })
+        }
+    }
+    else if (tasktype == "2"){
+        if (ads < 100){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        if (fiestaparticipation < 100){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        if (sponsoraparticipation < 1){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: "playall", value: "1"})
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
+        
+        const addmc = await addwalletamount(id, "monstercoin", 300)
+
+        if (addmc != "success"){
+            return res.status(400).json({ message: "bad-request" })
+        }
+    }
+    else if (tasktype == "3"){
+        if (pooldetails.subscription != "Ruby" && pooldetails.subscription != "Emerald" && pooldetails.subscription != "Diamond"){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        if (fiestaparticipation < 20){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        if (ads < 20){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: "sponsorgame", value: "1"})
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
+        
+        const addmc = await addwalletamount(id, "monstercoin", 50)
+
+        if (addmc != "success"){
+            return res.status(400).json({ message: "bad-request" })
+        }
+    }
+    else if (tasktype == "4"){
+        if (ads < 20){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: "fiestagame", value: "1"})
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
+        
+        const addmc = await addwalletamount(id, "monstercoin", 50)
+
+        if (addmc != "success"){
+            return res.status(400).json({ message: "bad-request" })
+        }
+    }
+    else if (tasktype == "5"){
+        if (directinvite < 20){
+            return res.json({message: "requirementsnotmet"})
+        }
+
+        const addmc = await addwalletamount(id, "monstercoin", 1000)
+
+        if (addmc != "success"){
+            return res.status(400).json({ message: "bad-request" })
+        }
+    }
+    else{
+        return res.json({message: "tasknotexist"})
+    }
+
+    return res.json({message: "success"})
 }
