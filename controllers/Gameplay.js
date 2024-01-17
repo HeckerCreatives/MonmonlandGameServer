@@ -104,12 +104,10 @@ exports.playgame = async (req, res) => {
     
     //  Check energy
     const energyamount = await Energy.findOne({owner: new mongoose.Types.ObjectId(id)})
-    .then(data => data.amount)
+    .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     if (!energyamount){
-        console.log(id)
-        console.log(energyamount)
         return res.json({message: "energynotexist"})
     }
 
@@ -117,13 +115,13 @@ exports.playgame = async (req, res) => {
 
     if (cosmeticequip){
         if (cosmeticequip.name != "Energy"){
-            if (energyamount < energyconsumption){
+            if (energyamount.amount < energyconsumption){
                 return res.json({message: "notenoughenergy"})
             }
         }
     }
     else{
-        if (energyamount < energyconsumption){
+        if (energyamount.amount < energyconsumption){
             return res.json({message: "notenoughenergy"})
         }
     }
