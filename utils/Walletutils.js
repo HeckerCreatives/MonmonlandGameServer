@@ -525,18 +525,6 @@ exports.rebatestowallet = async (id, wallettype, amount, type) => {
 }
 
 exports.addpointswalletamount = async (id, wallettype, amount) => {
-
-    const walletscutoff = await Walletscutoff.findOne({owner: new mongoose.Types.ObjectId(id), wallettype: "directpoints"})
-    .then(data => data.amount)
-    .catch(err => {
-        console.log(err.message, "find wallets cutoff failed")
-        return "bad-request"
-    })
-    
-    if (walletscutoff <= 0){
-        return "success"
-    }
-
     return await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
     .then(async () => {
         return await Walletscutoff.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: wallettype}, {$inc: {amount: amount}})
