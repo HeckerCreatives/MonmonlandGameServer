@@ -8,14 +8,14 @@ exports.computecomplan = async (amount) => {
                 
     const complan = (amount * 0.25)
     const leaderboards = (amount * 0.03)
-    const grinding = (amount * 0.45)
+    const grinding = (amount * 0.35)
     const diamondpools = (amount * 0.02)
-    const devsshare = (amount * 0.02)
-    const companyshare = (amount * 0.03)
+    const devsshare = (amount * 0.05)
+    const companyshare = (amount * 0.05)
     const officers = (amount * 0.05)
     const marketing = (amount * 0.03)
     const incentives = (amount * 0.02)
-    const monstergem = (amount * 0.10)
+    const monstergem = (amount * 0.15)
     const tradepayin = (amount * 0.0)
 
     const bulkOperations = [
@@ -109,14 +109,14 @@ exports.computemerchcomplan = async (amount, itemtype) => {
                 
     const complan = (amount * 0.22)
     const leaderboards = (amount * 0.03)
-    const grinding = (amount * 0.45)
+    const grinding = (amount * 0.15)
     const diamondpools = (amount * 0.03)
     const devsshare = (amount * 0.05)
     const companyshare = (amount * 0.05)
     const officers = (amount * 0.05)
     const marketing = (amount * 0.02)
     const incentives = (amount * 0.05)
-    const monstergem = (amount * 0.05)
+    const monstergem = (amount * 0.35)
     const tradepayin = (amount * 0.0)
 
     const bulkOperations = [
@@ -210,14 +210,14 @@ exports.computeshopcomplan = async (amount, itemtype) => {
 
     const complan = (amount * 0.17)
     const leaderboards = (amount * 0.03)
-    const grinding = (amount * 0.45)
+    const grinding = (amount * 0.25)
     const diamondpools = (amount * 0.03)
     const devsshare = (amount * 0.05)
     const companyshare = (amount * 0.05)
     const officers = (amount * 0.05)
     const marketing = (amount * 0.02)
     const incentives = (amount * 0.05)
-    const monstergem = (amount * 0.10)
+    const monstergem = (amount * 0.30)
     const tradepayin = (amount * 0.0)
 
     const bulkOperations = [
