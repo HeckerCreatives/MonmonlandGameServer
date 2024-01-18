@@ -111,7 +111,7 @@ exports.buyclocks = async (req, res) => {
     const sendcoms = await sendmgtounilevel(clocksamount, id, "Clocks Unilevel", clockstype, "merchandise")
 
     if (sendcoms == "success"){
-        const time = DateTimeServerExpiration(30)
+        const time = DateTimeServerExpiration(31)
         await Clock.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: clockstype}, {isowned: "1", expiration: time})
         .then(async () => {
 

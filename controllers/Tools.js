@@ -111,7 +111,7 @@ exports.buytools = async (req, res) => {
     const sendcoms = await sendmgtounilevel(toolsamount, id, "Tools Unilevel", toolstype, "tools")
 
     if (sendcoms == "success"){
-        const time = DateTimeServerExpiration(30)
+        const time = DateTimeServerExpiration(31)
         await Equipment.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: toolstype}, {isowned: "1", expiration: time})
         .then(async () => {
             const complan = await computemerchcomplan(toolsamount, "tools")
