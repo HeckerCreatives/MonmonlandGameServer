@@ -127,21 +127,23 @@ exports.playgame = async (req, res) => {
         }
     }
 
-    const addtotalmc = await addtototalfarmmc(monstercoin, finalmg)
     let finalap = monstercoin;
 
-    if (addtotalmc.message != "success"){
-        return res.json({message: "failed"})
-    }
+    if (pooldeets.subscription != "Pearl"){
+        const addtotalmc = await addtototalfarmmc(monstercoin, finalmg)
 
-    if (monstercoin > addtotalmc.mctobeadded){
-        monstercoin = addtotalmc.mctobeadded
+        if (addtotalmc.message != "success"){
+            return res.json({message: "failed"})
+        }
+    
+        if (monstercoin > addtotalmc.mctobeadded){
+            monstercoin = addtotalmc.mctobeadded
+        }
+    
+        if (finalmg > addtotalmc.mgtobeadded){
+            finalmg = addtotalmc.mgtobeadded
+        }
     }
-
-    if (finalmg > addtotalmc.mgtobeadded){
-        finalmg = addtotalmc.mgtobeadded
-    }
-
 
     await Ingamegames.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: gametype}, { status: "playing", timestarted: DateTimeServer(), unixtime: expiredtime, harvestmc: monstercoin, harvestmg: finalmg, harvestap: finalap})
     .then(async data => {
@@ -272,6 +274,15 @@ exports.claimgame = async (req, res) => {
         return res.json({message: "maintenance"})
     }
 
+    const pooldeets = await getpooldetails(id)
+
+    if (pooldeets == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldeets == "bad-request"){
+        return res.status(400).json({message: "bad-request"})
+    }
+
     const game = await Ingamegames.findOne({owner: new mongoose.Types.ObjectId(id), type: gametype})
     .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
@@ -286,25 +297,27 @@ exports.claimgame = async (req, res) => {
 
     const totalMCFarmed = getfarm(game.timestarted, game.unixtime, game.harvestmc)
     const totalMGFarmed = getfarm(game.timestarted, game.unixtime, game.harvestmg)
-    const totalAPFarmed = totalMCFarmed
+    const totalAPFarmed = getfarm(game.timestarted, game.unixtime, game.harvestap)
 
-    if (totalMCFarmed < game.harvestmc){
-        const tobeminus = game.harvestmc - totalMCFarmed
-
-        const minus = await minustototalcoins("Monster Coin", tobeminus)
-
-        if (minus != "success"){
-            return res.status(400).json({ message: "bad-request" })
+    if (pooldeets.subscription != "Pearl"){
+        if (totalMCFarmed < game.harvestmc){
+            const tobeminus = game.harvestmc - totalMCFarmed
+    
+            const minus = await minustototalcoins("Monster Coin", tobeminus)
+    
+            if (minus != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
         }
-    }
-
-    if (totalMGFarmed < game.harvestmg){
-        const tobeminus = game.harvestmg - totalMGFarmed
-
-        const minus = await minustototalcoins("Monster Gem", tobeminus)
-
-        if (minus != "success"){
-            return res.status(400).json({ message: "bad-request" })
+    
+        if (totalMGFarmed < game.harvestmg){
+            const tobeminus = game.harvestmg - totalMGFarmed
+    
+            const minus = await minustototalcoins("Monster Gem", tobeminus)
+    
+            if (minus != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
         }
     }
 
