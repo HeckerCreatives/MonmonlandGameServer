@@ -30,7 +30,6 @@ exports.authlogin = async (req, res) => {
 
     Gameusers.findOne({ username: { $regex: new RegExp('^' + username + '$', 'i') } })
     .then(async user => {
-        console.log(user)
         if (user && (await user.matchPassword(password))){
             if (user.status != "active"){
                 return res.json({ message: "banned" })
