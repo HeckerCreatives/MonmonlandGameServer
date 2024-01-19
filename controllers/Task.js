@@ -4,6 +4,7 @@ const Task = require("../models/Task")
 const Gameunlock = require("../models/Gameunlock")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
 const { addwalletamount } = require("../utils/Walletutils")
+const { addtototalfarmmc } = require("../utils/Gameutils")
 
 exports.gettaskdata = async(req, res) => {
     const { id } = req.user
@@ -115,10 +116,25 @@ exports.claimtask = async(req, res) => {
         await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: "claimall", value: "1"})
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
         
-        const addmc = await addwalletamount(id, "monstercoin", 200)
+        if (pooldetails.subscription != "Pearl"){
+            const addtofarm = await addtototalfarmmc(200, 0)
 
-        if (addmc != "success"){
-            return res.status(400).json({ message: "bad-request" })
+            if (addtofarm.message != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+        }
+        else{
+            const addmc = await addwalletamount(id, "monstercoin", 200)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
         }
     }
     else if (tasktype == "2"){
@@ -137,10 +153,25 @@ exports.claimtask = async(req, res) => {
         await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: "playall", value: "1"})
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
         
-        const addmc = await addwalletamount(id, "monstercoin", 300)
+        if (pooldetails.subscription != "Pearl"){
+            const addtofarm = await addtototalfarmmc(300, 0)
 
-        if (addmc != "success"){
-            return res.status(400).json({ message: "bad-request" })
+            if (addtofarm.message != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+        }
+        else{
+            const addmc = await addwalletamount(id, "monstercoin", 300)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
         }
     }
     else if (tasktype == "3"){
@@ -159,10 +190,25 @@ exports.claimtask = async(req, res) => {
         await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: "sponsorgame", value: "1"})
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
         
-        const addmc = await addwalletamount(id, "monstercoin", 50)
+        if (pooldetails.subscription != "Pearl"){
+            const addtofarm = await addtototalfarmmc(50, 0)
 
-        if (addmc != "success"){
-            return res.status(400).json({ message: "bad-request" })
+            if (addtofarm.message != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+        }
+        else{
+            const addmc = await addwalletamount(id, "monstercoin", 50)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
         }
     }
     else if (tasktype == "4"){
@@ -172,8 +218,27 @@ exports.claimtask = async(req, res) => {
 
         await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: "fiestagame", value: "1"})
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
-        
-        const addmc = await addwalletamount(id, "monstercoin", 50)
+
+        if (pooldetails.subscription != "Pearl"){
+            const addtofarm = await addtototalfarmmc(50, 0)
+
+            if (addtofarm.message != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+        }
+        else{
+            const addmc = await addwalletamount(id, "monstercoin", 50)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+        }
 
         if (addmc != "success"){
             return res.status(400).json({ message: "bad-request" })
@@ -184,7 +249,26 @@ exports.claimtask = async(req, res) => {
             return res.json({message: "requirementsnotmet"})
         }
 
-        const addmc = await addwalletamount(id, "monstercoin", 1000)
+        if (pooldetails.subscription != "Pearl"){
+            const addtofarm = await addtototalfarmmc(1000, 0)
+
+            if (addtofarm.message != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+        }
+        else{
+            const addmc = await addwalletamount(id, "monstercoin", 1000)
+            
+            if (addmc != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+        }
 
         if (addmc != "success"){
             return res.status(400).json({ message: "bad-request" })
