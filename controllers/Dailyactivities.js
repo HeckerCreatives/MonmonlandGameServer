@@ -6,6 +6,7 @@ const { getavailabledailyactivities } = require("../utils/Dailyactivities")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
 const { addwalletamount, addpointswalletamount } = require("../utils/Walletutils")
 const { setleaderboard } = require("../utils/Leaderboards")
+const { addtototalfarmmc } = require("../utils/Gameutils")
 
 exports.getdailyactivities = async (req, res) => {
     const { id } = req.user
@@ -106,13 +107,31 @@ exports.claimdaily = async (req, res) => {
 
         await Dailyactivities.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: type, status: "not-claimed"}, {status: "claimed"})
         .then(async () => {
-            const mc = await addwalletamount(id, "monstercoin", data.rewardsmc)
+
+            if (pools.subscription != "Pearl"){
+                const addtofarm = await addtototalfarmmc(data.rewardsmc, 0)
+
+                if (addtofarm.message != "success"){
+                    return res.status(400).json({message: "bad-request"})
+                }
+
+                const mc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+
+                if (mc != "success"){
+                    return res.status(400).json({message: "bad-request"})
+                }
+            }
+            else{
+                const mc = await addwalletamount(id, "monstercoin", data.rewardsmc)
+
+                if (mc != "success"){
+                    return res.status(400).json({message: "bad-request"})
+                }
+            }
+            
             const tp = await addpointswalletamount(id, "taskpoints", data.taskpoints)
             const addlbpoints = await setleaderboard(id, data.taskpoints)
 
-            if (mc != "success"){
-                return res.status(400).json({message: "bad-request"})
-            }
 
             if (tp != "success"){
                 return res.status(400).json({message: "bad-request"})

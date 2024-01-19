@@ -392,9 +392,9 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
                 break;
             }
             
-            const ownedtools = unilevelmg[a].equipmentData.some(tooldata => tooldata.isowned == '1' && tooldata.type != '1');
+            const ownedtools = await unilevelmg[a].equipmentData.some(tooldata => tooldata.isowned == '1' && tooldata.type != '1');
 
-            const ownedclocks = unilevelmg[a].clockdata == null ? false : unilevelmg[a].clockData.some(clockdata => clockdata.isowned == '1')
+            const ownedclocks = await unilevelmg[a].clockdata == null ? false : unilevelmg[a].clockData.some(clockdata => clockdata.isowned == '1')
 
             if (unilevelmg[a].owner == process.env.MONMONLAND_ID){
                 
@@ -410,8 +410,11 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
                 })
 
                 historypipeline.push({owner: new mongoose.Types.ObjectId(unilevelmg[a].owner), type: historytype, description: historytype, amount: amount, historystructure: `from userid: ${id} with amount of ${commissionAmount}`})
+
+                break;
             }
-            else if (ownedtools || ownedclocks){
+
+            if (ownedtools || ownedclocks){
 
                 let amount = 0;
 
