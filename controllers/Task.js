@@ -239,10 +239,6 @@ exports.claimtask = async(req, res) => {
                 return res.status(400).json({ message: "bad-request" })
             }
         }
-
-        if (addmc != "success"){
-            return res.status(400).json({ message: "bad-request" })
-        }
     }
     else if (tasktype == "5"){
         if (directinvite < 50){
@@ -268,10 +264,6 @@ exports.claimtask = async(req, res) => {
             if (addmc != "success"){
                 return res.status(400).json({ message: "bad-request" })
             }
-        }
-
-        if (addmc != "success"){
-            return res.status(400).json({ message: "bad-request" })
         }
     }
     else{
