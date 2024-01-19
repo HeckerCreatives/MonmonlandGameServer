@@ -1,3 +1,3 @@
-const { Tasksdataupdate, TaskGameUnlockUpdate } = require("./dataupdate/Newdataupdate")
+const { Tasksdataupdate, TaskGameUnlockUpdate, AddMissingTaskToUser } = require("./dataupdate/Newdataupdate")
 
-TaskGameUnlockUpdate()
+AddMissingTaskToUser()
