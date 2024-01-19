@@ -33,7 +33,7 @@ exports.checkenergyinventoryconsumable = (itemtype) => {
             itemamount = 1
             break;
         case "2energy":
-            itemaount = 5
+            itemamount = 5
             break;
         case "3energy":
             itemamount = 10
