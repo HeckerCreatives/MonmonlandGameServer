@@ -1,4 +1,4 @@
-const { sendcommissiontounilevel, checkwalletamount } = require("../utils/Walletutils")
+const { sendcommissiontounilevel, checkwalletamount, addwalletamount } = require("../utils/Walletutils")
 const { getsubsamount, getpooldetails } = require("../utils/Pooldetailsutils")
 const { computecomplan } = require("../webutils/Communityactivityutils")
 const Pooldetails = require("../models/Pooldetails")
@@ -61,6 +61,8 @@ exports.buysubscription = async (req, res) => {
     const sendcoms = await sendcommissiontounilevel(finalsubsamount, id, substype);
     
     if (sendcoms == "bad-request"){
+        await addwalletamount(id, "balance", finalsubsamount)
+
         return res.status(400).json({ message: "bad-request" })
     }
 
@@ -99,6 +101,7 @@ exports.buysubscription = async (req, res) => {
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
     }
     else{
+        await addwalletamount(id, "balance", finalsubsamount)
         return res.json({message: "failed"})
     }
 

@@ -13,13 +13,13 @@ exports.checkmgtools = (tooltype, cosmetics) => {
                 mgamount = 0.35;
                 break;
             case "3":
-                mgamount = 0.60;
+                mgamount = 0.70;
                 break;
             case "4":
-                mgamount = 0.75;
+                mgamount = 1;
                 break;
             case "5":
-                mgamount = 1;
+                mgamount = 1.20;
                 break;
             default:
                 mgamount = 0;
