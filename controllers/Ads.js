@@ -35,6 +35,7 @@ exports.claimads = async (req, res) => {
             case "5":
                 itemname = "5"
                 itemtype = "energy"
+                break;
             default:
                 return res.json({message: "noenergyitem"});
         }
