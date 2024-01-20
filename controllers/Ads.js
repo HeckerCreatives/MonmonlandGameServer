@@ -8,7 +8,7 @@ exports.claimads = async (req, res) => {
     const { id } = req.user
     const { adstype } = req.body
 
-    if (adstype >= 1 && adstype <= 3){
+    if (adstype >= 1 && adstype <= 5){
         let itemname = ""
         let itemtype = ""
         let qty = 1
