@@ -11,7 +11,7 @@ exports.claimads = async (req, res) => {
     if (adstype >= 1 && adstype <= 3){
         let itemname = ""
         let itemtype = ""
-        const qty = 1
+        let qty = 1
         
         switch(adstype){
             case "1":

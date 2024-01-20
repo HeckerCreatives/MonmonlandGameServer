@@ -7,7 +7,7 @@ const Gameactivity = require("../modelweb/Gameactivity")
 exports.checkmgtools = (tooltype, cosmetics) => {
     let mgamount = 0;
     
-    if (cosmetics == "Diamondring" || cosmetics == "Energyring"){
+    if (cosmetics == "Diamondring"){
         switch(tooltype) {
             case "2":
                 mgamount = 0.35;
