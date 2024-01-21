@@ -69,7 +69,7 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({message: "bad-request"})
     }
 
-    let timemultipliermg = 0;
+    let timemultipliermg = 1;
 
     switch(clocksequip?.type == null ? -1 : clocksequip?.type){
         case "1":
@@ -85,7 +85,7 @@ exports.playgame = async (req, res) => {
             timemultipliermg = 15
             break;
         default:
-            timemultipliermg = 0
+            timemultipliermg = 1
             break;
     }
 
