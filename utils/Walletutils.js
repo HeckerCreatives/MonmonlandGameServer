@@ -233,19 +233,8 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
 
             const addleaderboard = await setleaderboard(directreferralid, pointsamount)
 
-            if (addwallet != "success"){
-                response = "bad-request"
-
-                return;
-            }
-
-            if (adddrcutoff != "success"){
-                response = "bad-request"
-
-                return;
-            }
-
             if (addleaderboard != "success"){
+                console.log("damn2")
                 response = "bad-request"
 
                 return;
@@ -266,6 +255,7 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
         response = "success"
     })
     .catch(err => {
+        console.log(err.message)
         response = "bad-request"
     })
 

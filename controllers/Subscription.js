@@ -61,6 +61,7 @@ exports.buysubscription = async (req, res) => {
     const sendcoms = await sendcommissiontounilevel(finalsubsamount, id, substype);
     
     if (sendcoms == "bad-request"){
+        console.log("fck")
         await addwalletamount(id, "balance", finalsubsamount)
 
         return res.status(400).json({ message: "bad-request" })
