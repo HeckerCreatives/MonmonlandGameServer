@@ -1,6 +1,8 @@
 exports.getavailabledailyactivities = (substype, activitytype) => {
     const activitiesrank = {
-        Pearl: 1,
+        Pearl: {
+            1: "play"
+        },
         Ruby: {
             1: "play",
             2: "play"

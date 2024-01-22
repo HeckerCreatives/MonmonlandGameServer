@@ -93,7 +93,7 @@ exports.playgame = async (req, res) => {
 
     if (cosmeticequip){
         if (cosmeticequip.name == "Energy"){
-            energyringmg = ((0.30 / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription)
+            energyringmg = ((0.50 / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription)
         }
     }
 
