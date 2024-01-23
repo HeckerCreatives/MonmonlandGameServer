@@ -506,7 +506,6 @@ exports.endsupermonmon = async (req, res) => {
     }
 
     const prizes = await fiestarewards()
-    console.log(prizes)
     if (prizes.message == "success"){
         if (prizes.type == "energy"){
             await EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type})
@@ -571,8 +570,14 @@ exports.supermonmonleaderboard = async (req, res) => {
 
         const finaldata = {}
 
+        index = 0;
         data.forEach(lbdata => {
-            finaldata[lbdata.owner.username] = lbdata.amount
+            finaldata[index] = {
+                score: lbdata.amount,
+                username: lbdata.owner.username
+            }
+
+            index++
         })
 
         return res.json({message: "success", data: finaldata})

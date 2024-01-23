@@ -326,11 +326,8 @@ exports.fiestarewards = async () => {
 
     let cumulativeChance = 0;
 
-    console.log(randomNumber)
-
     for (const { name, type, chance } of chances) {
         cumulativeChance += chance;
-        console.log(cumulativeChance)
         if (randomNumber <= cumulativeChance) {
             return { message: "success", name: name, type: type}
         }
