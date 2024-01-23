@@ -6,7 +6,7 @@ const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, 
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
-const { DateTimeGameExpiration, DateTimeServer, CalculateSecondsBetween, UnixtimeToDateTime } = require("../utils/Datetimetools")
+const { DateTimeGameExpiration, DateTimeServer, CalculateSecondsBetween, UnixtimeToDateTime, DateTimeGameExpirationMinutes } = require("../utils/Datetimetools")
 const { addwalletamount, addpointswalletamount, checkmcwalletamount } = require("../utils/Walletutils")
 const { default: mongoose } = require("mongoose")
 const { setleaderboard, setfiestaleaderboard } = require("../utils/Leaderboards")
@@ -15,6 +15,8 @@ const Gameunlock = require("../models/Gameunlock")
 const Supermonmon = require("../models/Supermonmon")
 const EnergyInventory = require("../models/Energyinventory")
 const Fiesta = require("../models/Fiesta")
+const Prizepools = require("../models/Prizepools")
+const Palosebo = require("../models/Palosebo")
 
 exports.playgame = async (req, res) => {
     const { id } = req.user
@@ -72,7 +74,7 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({message: "bad-request"})
     }
 
-    let timemultipliermg = 0;
+    let timemultipliermg = 3;
 
     switch(clocksequip?.type == null ? -1 : clocksequip?.type){
         case "1":
@@ -88,7 +90,7 @@ exports.playgame = async (req, res) => {
             timemultipliermg = 15
             break;
         default:
-            timemultipliermg = 0
+            timemultipliermg = 3
             break;
     }
 
@@ -364,13 +366,225 @@ exports.claimgame = async (req, res) => {
 }
 
 exports.playpalosebo = async (req, res) => {
+    const { id } = req.user
+
     const maintenance = await checkmaintenance("maintenancefiestagame")
 
     if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
 
+    const pooldeets = await getpooldetails(id)
+
+    if (pooldeets == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldeets == "bad-request"){
+        return res.status(400).json({message: "bad-request"})
+    }
+
+    if (pooldeets.subscription == "Pearl"){
+        return res.json({message: "restricted"})
+    }
+    
     return res.json({message: "success"})
+}
+
+exports.startpalosebo = async (req, res) => {
+    const { id } = req.user
+
+    const maintenance = await checkmaintenance("maintenancefiestagame")
+
+    if (maintenance == "1") {
+        return res.json({message: "maintenance"})
+    }
+
+    const pooldeets = await getpooldetails(id)
+
+    if (pooldeets == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldeets == "bad-request"){
+        return res.status(400).json({message: "bad-request"})
+    }
+
+    if (pooldeets.subscription == "Pearl"){
+        return res.json({message: "restricted"})
+    }
+
+    const palosebodata = await Palosebo.findOne({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    if (!palosebodata){
+        return res.json({message: "nopalosebodata"})
+    }
+
+    const checkwallet = await checkmcwalletamount(10, id)
+
+    if (checkwallet == "notexist"){
+        return res.json({message: "walletnotexist"})
+    }
+
+    if (checkwallet == "notenoughfunds"){
+        return res.json({message: "notenoughfunds"})
+    }
+
+    if (checkwallet == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+    
+    const minus = await minustototalcoins("Monster Coin", 1)
+    
+    if (minus != "success"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    const addtoprizepools = await prizepooladd(9, "palosebo")
+
+    if (addtoprizepools == "notexist"){
+        return res.json({message: "notexist"})
+    }
+
+    if (addtoprizepools == "bad-request"){
+        return res.json({message: "bad-request"})
+    }
+    console.log(DateTimeGameExpirationMinutes(5), DateTimeServer())
+    await Palosebo.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {endttime: DateTimeGameExpirationMinutes(5), starttime: DateTimeServer()})
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    
+    return res.json({message: "success"})
+}
+
+exports.endpalosebo = async (req, res) => {
+    const { id } = req.user
+    const { score } = req.body
+
+    const pooldeets = await getpooldetails(id)
+
+    if (pooldeets == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldeets == "bad-request"){
+        return res.status(400).json({message: "bad-request"})
+    }
+
+    if (pooldeets.subscription == "Pearl"){
+        return res.json({message: "restricted"})
+    }
+
+    const palosebodata = await Palosebo.findOne({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    if (!palosebodata){
+        return res.json({message: "nopalosebodata"})
+    }
+
+    if (palosebodata.starttime <= 0){
+        return res.json({message: "gamenotstarted"})
+    }
+
+    const scorechecker = getfarm(palosebodata.starttime, palosebodata.endttime, 300)
+
+    if (score > scorechecker){
+        return res.json({message: "cheater"})
+    }
+    
+    const finaldata = {}
+
+    if (scorechecker > 0){
+        const fiestalb = await setfiestaleaderboard(id, "palosebo", score)
+
+        if (fiestalb != "success"){
+            return res.json({message: "bad-request"})
+        }
+    
+        const prizes = await fiestarewards()
+        if (prizes.message == "success"){
+            if (prizes.type == "energy"){
+                await EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type})
+                .then(async dataenergy => {
+                    if (!dataenergy){
+                        await EnergyInventory.create({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type, amount: 1, consumableamount: checkenergyinventoryconsumable(`${prizes.name}${prizes.name}`)})
+                        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+                    }
+    
+                    await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type}, {$inc: { amount: 1 }})
+                    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+                })
+                .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+            }
+            else if (prizes.type == "monster coin"){
+                const addtotalmc = await addtototalfarmmc(parseInt(prizes.name), 0)
+    
+                if (addtotalmc.message != "success"){
+                    return res.json({message: "failed"})
+                }
+            
+                if (parseInt(prizes.name) > addtotalmc.mctobeadded){
+                    const mcadd = await addwalletamount(id, "monstercoin", addtotalmc.mctobeadded)
+                    if (mcadd != "success"){
+                        return res.status(400).json({ message: "bad-request" })
+                    }
+                }
+                else{
+                    const mcadd = await addwalletamount(id, "monstercoin", parseInt(prizes.name))
+                    if (mcadd != "success"){
+                        return res.status(400).json({ message: "bad-request" })
+                    }
+                }
+            }
+        }
+
+        finaldata["prizes"] = {
+            name: prizes.name,
+            type: prizes.type
+        }
+    }
+
+    await Palosebo.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {endttime: 0, starttime: 0})
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    return res.json({message: "success", data: finaldata})
+}
+
+exports.paloseboleaderboard = async (req, res) => {
+    return await Fiesta.find({type: "palosebo", amount: { $gt: 0 }})
+    .populate({
+        path: "owner",
+        select: "username"
+    })
+    .sort({amount: -1})
+    .limit(15)
+    .then(async data => {
+        if (data.length <= 0){
+            return res.json({message: "success", data: {}})
+        }
+
+        const finaldata = {
+            leaderboard: {}
+        }
+
+        index = 0;
+        data.forEach(lbdata => {
+            finaldata["leaderboard"][index] = {
+                score: lbdata.amount,
+                username: lbdata.owner.username
+            }
+
+            index++
+        })
+
+        const prizepool = await Prizepools.findOne({type: "palosebo"})
+        .then(data => data)
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+        finaldata["prizepools"] = prizepool.amount;
+
+        return res.json({message: "success", data: finaldata})
+    })
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }
 
 exports.playsupermonmon = async (req, res) => {
@@ -556,29 +770,37 @@ exports.endsupermonmon = async (req, res) => {
 }
 
 exports.supermonmonleaderboard = async (req, res) => {
-    return await Fiesta.find({type: "supermonmon", amount: { $gt: 0}})
+    return await Fiesta.find({type: "supermonmon", amount: { $gt: 0 }})
     .populate({
         path: "owner",
         select: "username"
     })
     .sort({amount: -1})
     .limit(15)
-    .then(data => {
+    .then(async data => {
         if (data.length <= 0){
             return res.json({message: "success", data: {}})
         }
 
-        const finaldata = {}
+        const finaldata = {
+            leaderboard: {}
+        }
 
         index = 0;
         data.forEach(lbdata => {
-            finaldata[index] = {
+            finaldata["leaderboard"][index] = {
                 score: lbdata.amount,
                 username: lbdata.owner.username
             }
 
             index++
         })
+
+        const prizepool = await Prizepools.findOne({type: "supermonmon"})
+        .then(data => data)
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+        finaldata["prizepools"] = prizepool.amount;
 
         return res.json({message: "success", data: finaldata})
     })

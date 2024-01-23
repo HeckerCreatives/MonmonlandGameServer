@@ -34,8 +34,23 @@ exports.DateTimeGameExpiration = (expiration) => {
     // Convert it to Unix timestamp in seconds
     const unixTimeSeconds = Math.floor(unixTimeMilliseconds / 1000);
 
-    // Add 15 hours (15 * 3600 seconds) to the Unix timestamp
+    // Add number of expiration hours (expiration * 3600 seconds) to the Unix timestamp
     const newUnixTimeSeconds = unixTimeSeconds + (expiration * 3600);
+
+    return newUnixTimeSeconds;
+}
+
+exports.DateTimeGameExpirationMinutes = (expiration) => {
+    const date = new Date();
+
+    // Get the Unix timestamp in milliseconds
+    const unixTimeMilliseconds = date.getTime();
+
+    // Convert it to Unix timestamp in seconds
+    const unixTimeSeconds = Math.floor(unixTimeMilliseconds / 1000);
+
+    // Add number of expiration minutes (expiration * 60 seconds) to the Unix timestamp
+    const newUnixTimeSeconds = unixTimeSeconds + (expiration * 60);
 
     return newUnixTimeSeconds;
 }

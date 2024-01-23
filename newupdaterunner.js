@@ -1,3 +1,4 @@
-const { Tasksdataupdate, TaskGameUnlockUpdate, AddMissingTaskToUser, addsupermonmonuserdata } = require("./dataupdate/Newdataupdate")
+const { Tasksdataupdate, TaskGameUnlockUpdate, AddMissingTaskToUser, addsupermonmonuserdata, addpalosebodata } = require("./dataupdate/Newdataupdate")
 
 // AddMissingTaskToUser()
+addpalosebodata()

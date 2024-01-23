@@ -289,3 +289,67 @@ exports.addsupermonmonuserdata = async() => {
 
     await closedatabase();
 }
+
+exports.addpalosebodata = async() => {
+    const client = await connecttodatabase();
+    const database = client.db()
+
+    const gameusers = database.collection("gameusers")
+    const palosebos = database.collection("palosebos")
+    const fiestas = database.collection("fiestas")
+
+    const userlistpipeline = [
+        {
+            $lookup: {
+                from: 'palosebos',  // Assuming your Tasks collection is named 'tasks'
+                localField: '_id',
+                foreignField: 'owner',
+                as: 'palosebo'
+            }
+        },
+        {
+            $match: {
+                palosebo: {
+                    $size: 0  // Filter users with no tasks
+                }
+            }
+        }
+    ]
+
+    const userlistaggregate = gameusers.aggregate(userlistpipeline)
+    const userlistdata = await userlistaggregate.toArray()
+
+    const paloseboBulkWrite = []
+    const fiestaBulkWrite = []
+
+    userlistdata.forEach(data => {
+        paloseboBulkWrite.push(
+            {
+                insertOne: {
+                    document: {
+                        owner: new mongoose.Types.ObjectId(data._id),
+                        starttime: 0,
+                        endttime: 0
+                    }
+                }
+            },
+        )
+
+        fiestaBulkWrite.push(
+            {
+                insertOne: {
+                    document: {
+                        owner: new mongoose.Types.ObjectId(data._id),
+                        type: "palosebo",
+                        amount: 0
+                    }
+                }
+            }
+        )
+    })
+
+    await palosebos.bulkWrite(paloseboBulkWrite)
+    await fiestas.bulkWrite(fiestaBulkWrite)
+
+    await closedatabase();
+}
