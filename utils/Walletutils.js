@@ -60,6 +60,12 @@ exports.checkmcwalletamount = async (amount, id) => {
     .catch(err => "bad-request")
 }
 
+exports.getwalletamount = async (id, type) => {
+    return await Gamewallet.findOne({owner: new mongoose.Types.ObjectId(id), wallettype: type})
+    .then(data => data)
+    .catch(err => "bad-request")
+}
+
 exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
     let response = ""
     await Gameusers.findOne({_id: id})
