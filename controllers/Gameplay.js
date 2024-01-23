@@ -488,7 +488,7 @@ exports.endpalosebo = async (req, res) => {
     const scorechecker = getfarm(palosebodata.starttime, palosebodata.endttime, 300)
 
     if (score > scorechecker){
-        return res.json({message: "cheater"})
+        return res.json({message: "cheater", expectedscore: scorechecker, scoresend: score})
     }
     
     const finaldata = {}
@@ -814,5 +814,40 @@ exports.playsponsor = async (req, res) => {
         return res.json({message: "maintenance"})
     }
 
+    if (pooldeets == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldeets == "bad-request"){
+        return res.status(400).json({message: "bad-request"})
+    }
+
+    if (pooldeets.subscription == "Pearl"){
+        return res.json({message: "restricted"})
+    }
+
     return res.json({message: "success"})
 }
+
+// exports.startsponsor = async (req, res) => {
+
+//     const maintenance = await checkmaintenance("maintenancesponsor")
+
+//     if (maintenance == "1") {
+//         return res.json({message: "maintenance"})
+//     }
+
+//     const pooldeets = await getpooldetails(id)
+
+//     if (pooldeets == "erroraccount"){
+//         return res.json({message: "erroraccount"})
+//     }
+//     else if (pooldeets == "bad-request"){
+//         return res.status(400).json({message: "bad-request"})
+//     }
+
+//     if (pooldeets.subscription == "Pearl"){
+//         return res.json({message: "restricted"})
+//     }
+
+
+// }
