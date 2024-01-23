@@ -449,9 +449,15 @@ exports.startpalosebo = async (req, res) => {
     if (addtoprizepools == "bad-request"){
         return res.json({message: "bad-request"})
     }
-    console.log(DateTimeGameExpirationMinutes(5), DateTimeServer())
+
     await Palosebo.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {endttime: DateTimeGameExpirationMinutes(5), starttime: DateTimeServer()})
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    const participation = await addpointswalletamount(id, "fiestaparticipation", 1)
+
+    if (participation != "success"){
+        return res.json({message: "bad-request"})
+    }
     
     return res.json({message: "success"})
 }
@@ -676,6 +682,12 @@ exports.startsupermonmon = async (req, res) => {
     
     await Supermonmon.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {starttime: DateTimeServer()})
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    
+    const participation = await addpointswalletamount(id, "fiestaparticipation", 1)
+
+    if (participation != "success"){
+        return res.json({message: "bad-request"})
+    }
 
     return res.json({message: "success"})
 }

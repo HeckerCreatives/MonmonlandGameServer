@@ -66,6 +66,12 @@ exports.getwalletamount = async (id, type) => {
     .catch(err => "bad-request")
 }
 
+exports.getwalletcutoffamount = async (id, type) => {
+    return await Walletscutoff.findOne({owner: new mongoose.Types.ObjectId(id), wallettype: type})
+    .then(data => data)
+    .catch(err => "bad-request")
+}
+
 exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
     let response = ""
     await Gameusers.findOne({_id: id})

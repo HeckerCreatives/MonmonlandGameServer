@@ -1,8 +1,9 @@
 const EnergyInventory = require("../models/Energyinventory")
-const { addpointswalletamount } = require("../utils/Walletutils")
+const { addpointswalletamount, getwalletcutoffamount } = require("../utils/Walletutils")
 const { setleaderboard } = require("../utils/Leaderboards")
 const { default: mongoose } = require("mongoose")
 const { checkenergyinventoryconsumable } = require("../utils/Energyutils")
+const { getpooldetails } = require("../utils/Pooldetailsutils")
 
 exports.claimads = async (req, res) => {
     const { id } = req.user
@@ -12,6 +13,21 @@ exports.claimads = async (req, res) => {
         let itemname = ""
         let itemtype = ""
         let qty = 1
+
+        const pooldeets = await getpooldetails(id)
+
+        if (pooldeets == "erroraccount"){
+            return res.json({message: "erroraccount"})
+        }
+        else if (pooldeets == "bad-request"){
+            return res.status(400).json({message: "bad-request"})
+        }
+
+        const cutoffbalance = await getwalletcutoffamount(id, "adspoints")
+
+        if (cutoffbalance == "bad-request"){
+            return res.status(400).json({ message: "bad-request" })
+        }
         
         switch(adstype){
             case "1":
@@ -40,16 +56,38 @@ exports.claimads = async (req, res) => {
                 return res.json({message: "noenergyitem"});
         }
 
-        const grantwalletpoints = await addpointswalletamount(id, "adspoints", 1)
-        const grantlbpoints = await setleaderboard(id, 1)
+        let limit = 0;
 
-
-        if (grantwalletpoints != "success"){
-            return res.status(400).json({ message: "bad-request" })
+        switch(pooldeets.subscription){
+            case "Pearl":
+                limit = 500;
+            break;
+            case "Ruby":
+                limit = 1000;
+            break;
+            case "Emerald":
+                limit = 2000;
+            break;
+            case "Diamond":
+                limit = 4000;
+            break;
+            default:
+                limit = 0;
+            break;
         }
 
-        if (grantlbpoints != "success"){
-            return res.status(400).json({ message: "bad-request" })
+        if (cutoffbalance.amount < limit){
+            const grantwalletpoints = await addpointswalletamount(id, "adspoints", 1)
+            const grantlbpoints = await setleaderboard(id, 1)
+    
+    
+            if (grantwalletpoints != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+    
+            if (grantlbpoints != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
         }
 
         await EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype})
@@ -63,7 +101,6 @@ exports.claimads = async (req, res) => {
     
                 return
             }
-    
             await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype}, {$inc: { amount: qty }})
             .then(() => {
                 res.json({message: "success"})
