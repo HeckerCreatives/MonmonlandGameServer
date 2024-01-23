@@ -487,8 +487,10 @@ exports.endpalosebo = async (req, res) => {
 
     const scorechecker = getfarm(palosebodata.starttime, palosebodata.endttime, 300)
 
-    if (score > scorechecker){
-        return res.json({message: "cheater", expectedscore: scorechecker, scoresend: score})
+    const finalscorechecker = 305 - scorechecker
+
+    if (score > finalscorechecker){
+        return res.json({message: "cheater", expectedscore: finalscorechecker, scoresend: score})
     }
     
     const finaldata = {}
@@ -499,48 +501,48 @@ exports.endpalosebo = async (req, res) => {
         if (fiestalb != "success"){
             return res.json({message: "bad-request"})
         }
-    
-        const prizes = await fiestarewards()
-        if (prizes.message == "success"){
-            if (prizes.type == "energy"){
-                await EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type})
-                .then(async dataenergy => {
-                    if (!dataenergy){
-                        await EnergyInventory.create({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type, amount: 1, consumableamount: checkenergyinventoryconsumable(`${prizes.name}${prizes.name}`)})
-                        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
-                    }
-    
-                    await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type}, {$inc: { amount: 1 }})
-                    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
-                })
-                .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
-            }
-            else if (prizes.type == "monster coin"){
-                const addtotalmc = await addtototalfarmmc(parseInt(prizes.name), 0)
-    
-                if (addtotalmc.message != "success"){
-                    return res.json({message: "failed"})
-                }
-            
-                if (parseInt(prizes.name) > addtotalmc.mctobeadded){
-                    const mcadd = await addwalletamount(id, "monstercoin", addtotalmc.mctobeadded)
-                    if (mcadd != "success"){
-                        return res.status(400).json({ message: "bad-request" })
-                    }
-                }
-                else{
-                    const mcadd = await addwalletamount(id, "monstercoin", parseInt(prizes.name))
-                    if (mcadd != "success"){
-                        return res.status(400).json({ message: "bad-request" })
-                    }
-                }
-            }
-        }
+    }
 
-        finaldata["prizes"] = {
-            name: prizes.name,
-            type: prizes.type
+    const prizes = await fiestarewards()
+    if (prizes.message == "success"){
+        if (prizes.type == "energy"){
+            await EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type})
+            .then(async dataenergy => {
+                if (!dataenergy){
+                    await EnergyInventory.create({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type, amount: 1, consumableamount: checkenergyinventoryconsumable(`${prizes.name}${prizes.name}`)})
+                    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+                }
+
+                await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type}, {$inc: { amount: 1 }})
+                .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+            })
+            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
         }
+        else if (prizes.type == "monster coin"){
+            const addtotalmc = await addtototalfarmmc(parseInt(prizes.name), 0)
+
+            if (addtotalmc.message != "success"){
+                return res.json({message: "failed"})
+            }
+        
+            if (parseInt(prizes.name) > addtotalmc.mctobeadded){
+                const mcadd = await addwalletamount(id, "monstercoin", addtotalmc.mctobeadded)
+                if (mcadd != "success"){
+                    return res.status(400).json({ message: "bad-request" })
+                }
+            }
+            else{
+                const mcadd = await addwalletamount(id, "monstercoin", parseInt(prizes.name))
+                if (mcadd != "success"){
+                    return res.status(400).json({ message: "bad-request" })
+                }
+            }
+        }
+    }
+
+    finaldata["prizes"] = {
+        name: prizes.name,
+        type: prizes.type
     }
 
     await Palosebo.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {endttime: 0, starttime: 0})
