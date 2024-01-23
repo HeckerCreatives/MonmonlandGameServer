@@ -2,16 +2,19 @@ const Ingamegames = require("../models/Games")
 const Playtimegrinding = require("../models/Playtimegrinding")
 const Energy = require("../models/Energy")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
-const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue } = require("../utils/Gameutils")
+const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue, prizepooladd, fiestarewards } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
 const { DateTimeGameExpiration, DateTimeServer, CalculateSecondsBetween, UnixtimeToDateTime } = require("../utils/Datetimetools")
-const { addwalletamount, addpointswalletamount } = require("../utils/Walletutils")
+const { addwalletamount, addpointswalletamount, checkmcwalletamount } = require("../utils/Walletutils")
 const { default: mongoose } = require("mongoose")
-const { setleaderboard } = require("../utils/Leaderboards")
+const { setleaderboard, setfiestaleaderboard } = require("../utils/Leaderboards")
 const { checkmaintenance } = require("../utils/Maintenance")
 const Gameunlock = require("../models/Gameunlock")
+const Supermonmon = require("../models/Supermonmon")
+const EnergyInventory = require("../models/Energyinventory")
+const Fiesta = require("../models/Fiesta")
 
 exports.playgame = async (req, res) => {
     const { id } = req.user
@@ -69,7 +72,7 @@ exports.playgame = async (req, res) => {
         return res.status(400).json({message: "bad-request"})
     }
 
-    let timemultipliermg = 1;
+    let timemultipliermg = 0;
 
     switch(clocksequip?.type == null ? -1 : clocksequip?.type){
         case "1":
@@ -85,7 +88,7 @@ exports.playgame = async (req, res) => {
             timemultipliermg = 15
             break;
         default:
-            timemultipliermg = 1
+            timemultipliermg = 0
             break;
     }
 
@@ -93,7 +96,7 @@ exports.playgame = async (req, res) => {
 
     if (cosmeticequip){
         if (cosmeticequip.name == "Energy"){
-            energyringmg = ((0.50 / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription)
+            energyringmg = ((0.30 / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription)
         }
     }
 
@@ -371,13 +374,210 @@ exports.playpalosebo = async (req, res) => {
 }
 
 exports.playsupermonmon = async (req, res) => {
+    const { id } = req.user
+
     const maintenance = await checkmaintenance("maintenancefiestagame")
 
     if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
+
+    const pooldeets = await getpooldetails(id)
+
+    if (pooldeets == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldeets == "bad-request"){
+        return res.status(400).json({message: "bad-request"})
+    }
+
+    if (pooldeets.subscription == "Pearl"){
+        return res.json({message: "restricted"})
+    }
     
     return res.json({message: "success"})
+}
+
+exports.startsupermonmon = async (req, res) => {
+    const { id } = req.user
+
+    const maintenance = await checkmaintenance("maintenancefiestagame")
+
+    if (maintenance == "1") {
+        return res.json({message: "maintenance"})
+    }
+
+    const pooldeets = await getpooldetails(id)
+
+    if (pooldeets == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldeets == "bad-request"){
+        return res.status(400).json({message: "bad-request"})
+    }
+
+    if (pooldeets.subscription == "Pearl"){
+        return res.json({message: "restricted"})
+    }
+
+    const supermonmondata = await Supermonmon.findOne({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    if (!supermonmondata){
+        return res.json({message: "nosupermonmondata"})
+    }
+
+    const checkwallet = await checkmcwalletamount(10, id)
+
+    if (checkwallet == "notexist"){
+        return res.json({message: "walletnotexist"})
+    }
+
+    if (checkwallet == "notenoughfunds"){
+        return res.json({message: "notenoughfunds"})
+    }
+
+    if (checkwallet == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+    
+    const minus = await minustototalcoins("Monster Coin", 1)
+    
+    if (minus != "success"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    const addtoprizepools = await prizepooladd(9, "supermonmon")
+
+    if (addtoprizepools == "notexist"){
+        return res.json({message: "notexist"})
+    }
+
+    if (addtoprizepools == "bad-request"){
+        return res.json({message: "bad-request"})
+    }
+    
+    await Supermonmon.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {starttime: DateTimeServer()})
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    return res.json({message: "success"})
+}
+
+exports.endsupermonmon = async (req, res) => {
+    const { id } = req.user
+    const { score } = req.body
+
+    const pooldeets = await getpooldetails(id)
+
+    if (pooldeets == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldeets == "bad-request"){
+        return res.status(400).json({message: "bad-request"})
+    }
+
+    if (pooldeets.subscription == "Pearl"){
+        return res.json({message: "restricted"})
+    }
+
+    const supermonmondata = await Supermonmon.findOne({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    if (!supermonmondata){
+        return res.json({message: "nosupermonmondata"})
+    }
+
+    if (supermonmondata.starttime <= 0){
+        return res.json({message: "gamenotstarted"})
+    }
+
+    const scorechecker = DateTimeServer() - supermonmondata.starttime
+
+    if (score > scorechecker){
+        return res.json({message: "cheater"})
+    }
+
+    const fiestalb = await setfiestaleaderboard(id, "supermonmon", score)
+
+    if (fiestalb != "success"){
+        return res.json({message: "bad-request"})
+    }
+
+    const prizes = await fiestarewards()
+    console.log(prizes)
+    if (prizes.message == "success"){
+        if (prizes.type == "energy"){
+            await EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type})
+            .then(async dataenergy => {
+                if (!dataenergy){
+                    await EnergyInventory.create({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type, amount: 1, consumableamount: checkenergyinventoryconsumable(`${prizes.name}${prizes.name}`)})
+                    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+                }
+
+                await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: prizes.name, type: prizes.type}, {$inc: { amount: 1 }})
+                .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+            })
+            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+        }
+        else if (prizes.type == "monster coin"){
+            const addtotalmc = await addtototalfarmmc(parseInt(prizes.name), 0)
+
+            if (addtotalmc.message != "success"){
+                return res.json({message: "failed"})
+            }
+        
+            if (parseInt(prizes.name) > addtotalmc.mctobeadded){
+                const mcadd = await addwalletamount(id, "monstercoin", addtotalmc.mctobeadded)
+                if (mcadd != "success"){
+                    return res.status(400).json({ message: "bad-request" })
+                }
+            }
+            else{
+                const mcadd = await addwalletamount(id, "monstercoin", parseInt(prizes.name))
+                if (mcadd != "success"){
+                    return res.status(400).json({ message: "bad-request" })
+                }
+            }
+        }
+    }
+
+    await Supermonmon.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {starttime: 0})
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    const finaldata = {
+        prizes: {
+            name: prizes.name,
+            type: prizes.type
+        }
+    }
+
+    return res.json({message: "success", data: finaldata})
+}
+
+exports.supermonmonleaderboard = async (req, res) => {
+    return await Fiesta.find({type: "supermonmon", amount: { $gt: 0}})
+    .populate({
+        path: "owner",
+        select: "username"
+    })
+    .sort({amount: -1})
+    .limit(15)
+    .then(data => {
+        if (data.length <= 0){
+            return res.json({message: "success", data: {}})
+        }
+
+        const finaldata = {}
+
+        data.forEach(lbdata => {
+            finaldata[lbdata.owner.username] = lbdata.amount
+        })
+
+        return res.json({message: "success", data: finaldata})
+    })
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }
 
 exports.playsponsor = async (req, res) => {
@@ -388,5 +588,4 @@ exports.playsponsor = async (req, res) => {
     }
 
     return res.json({message: "success"})
-    //  ADDITIONAL CODE HERE
 }

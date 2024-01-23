@@ -226,3 +226,66 @@ exports.AddMissingTaskToUser = async () => {
 
     await closedatabase();
 }
+
+exports.addsupermonmonuserdata = async() => {
+    const client = await connecttodatabase();
+    const database = client.db()
+
+    const gameusers = database.collection("gameusers")
+    const supermonmons = database.collection("supermonmons")
+    const fiestas = database.collection("fiestas")
+
+    const userlistpipeline = [
+        {
+            $lookup: {
+                from: 'supermonmons',  // Assuming your Tasks collection is named 'tasks'
+                localField: '_id',
+                foreignField: 'owner',
+                as: 'supermonmon'
+            }
+        },
+        {
+            $match: {
+                supermonmon: {
+                    $size: 0  // Filter users with no tasks
+                }
+            }
+        }
+    ]
+
+    const userlistaggregate = gameusers.aggregate(userlistpipeline)
+    const userlistdata = await userlistaggregate.toArray()
+
+    const supermonmonBulkWrite = []
+    const fiestaBulkWrite = []
+
+    userlistdata.forEach(data => {
+        supermonmonBulkWrite.push(
+            {
+                insertOne: {
+                    document: {
+                        owner: new mongoose.Types.ObjectId(data._id),
+                        starttime: 0
+                    }
+                }
+            },
+        )
+
+        fiestaBulkWrite.push(
+            {
+                insertOne: {
+                    document: {
+                        owner: new mongoose.Types.ObjectId(data._id),
+                        type: "supermonmon",
+                        amount: 0
+                    }
+                }
+            }
+        )
+    })
+
+    await supermonmons.bulkWrite(supermonmonBulkWrite)
+    await fiestas.bulkWrite(fiestaBulkWrite)
+
+    await closedatabase();
+}

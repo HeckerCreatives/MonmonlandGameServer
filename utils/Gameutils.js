@@ -3,6 +3,7 @@ const Ads = require("../modelweb/Ads")
 const Investorfunds = require("../modelweb/Investorfunds")
 const Monmoncoin = require("../modelweb/Monmoncoin")
 const Gameactivity = require("../modelweb/Gameactivity")
+const Prizepools = require("../models/Prizepools")
 
 exports.checkmgtools = (tooltype, cosmetics) => {
     let mgamount = 0;
@@ -295,4 +296,45 @@ exports.getfarm = (timestarted, unixtime, maxtotal) => {
     const totalCoinsFarmed = Math.min((currentTimeBetween / 3600 * coinsPerHour), maxTotalCoins);
 
     return totalCoinsFarmed
+}
+
+exports.prizepooladd = async (amount, type) => {
+    return await Prizepools.findOne({type: type})
+    .then(async data => {
+        if (!data){
+            return "notexist"
+        }
+
+        return await Prizepools.findOneAndUpdate({type: type}, {$inc: {amount: amount}})
+        .then(() => "success")
+        .catch(() => "bad-request")
+    })
+    .catch(() => "bad-request")
+}
+
+exports.fiestarewards = async () => {
+    const randomNumber = Math.floor(Math.random() * 100) + 1;
+
+    const chances = [
+        { name: "1", type: "energy", chance: 80 },
+        { name: "2", type: "energy", chance: 9 },
+        { name: "3", type: "energy", chance: 5 },
+        { name: "5", type: "monster coin", chance: 3 },
+        { name: "10", type: "monster coin", chance: 2 },
+        { name: "20", type: "monster coin", chance: 1 },
+    ];
+
+    let cumulativeChance = 0;
+
+    console.log(randomNumber)
+
+    for (const { name, type, chance } of chances) {
+        cumulativeChance += chance;
+        console.log(cumulativeChance)
+        if (randomNumber <= cumulativeChance) {
+            return { message: "success", name: name, type: type}
+        }
+    }
+
+    return null;
 }
