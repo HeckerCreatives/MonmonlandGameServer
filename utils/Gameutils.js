@@ -4,6 +4,7 @@ const Investorfunds = require("../modelweb/Investorfunds")
 const Monmoncoin = require("../modelweb/Monmoncoin")
 const Gameactivity = require("../modelweb/Gameactivity")
 const Prizepools = require("../models/Prizepools")
+const { default: mongoose } = require("mongoose")
 
 exports.checkmgtools = (tooltype, cosmetics) => {
     let mgamount = 0;
@@ -103,7 +104,7 @@ exports.checkmgclock = (clocktype, substype) => {
         }
       };
     
-      return (pricingInfo[substype] && pricingInfo[substype][clocktype]) || pricingInfo[substype].default || 0;
+      return (pricingInfo[substype] && pricingInfo[substype][clocktype]) || 0;
 }
 
 exports.clockhoursadd = (clocktype) => {
@@ -334,4 +335,13 @@ exports.fiestarewards = async () => {
     }
 
     return null;
+}
+
+exports.getenergy = async(id) => {
+    return await Energy.findOne({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => {
+        console.log(err)
+        return "bad-request"
+    })
 }

@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const { connecttodatabase, closedatabase } = require("./database")
+const { checkmgtools, checkmgclock } = require('../utils/Gameutils')
 
 exports.Tasksdataupdate = async () => {
     const client = await connecttodatabase();
@@ -352,4 +353,202 @@ exports.addpalosebodata = async() => {
     await fiestas.bulkWrite(fiestaBulkWrite)
 
     await closedatabase();
+}
+
+exports.recomputemg = async() => {
+    
+    console.log("START RECOMPUTE MG")
+    
+    const client = await connecttodatabase();
+    const database = client.db()
+
+    const gameusers = database.collection("gameusers")
+    const clocks = database.collection("clocks")
+    const equipment = database.collection("equipment")
+    const cosmetics = database.collection("cosmetics")
+    const gamewallets = database.collection("gamewallets")
+    const ingamegames = database.collection("ingamegames")
+    const monmoncoins = database.collection("monmoncoins")
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const gameuserpipeline = [
+        {
+            $match: {
+                username: { $ne: "monmonland" }
+            }
+        },
+        {
+            $lookup: {
+                from: 'pooldetails',
+                localField: '_id',
+                foreignField: 'owner',
+                as: 'pooldetails'
+            }
+        },
+        {
+            $unwind: {
+                path: '$pooldetails',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $project: {
+                _id: 1,
+                username: 1,
+                subscription: '$pooldetails.subscription'
+            }
+        }
+    ]
+
+    const gameuserslist = await gameusers.aggregate(gameuserpipeline);
+
+    
+    console.log("GETTING USER LIST")
+    const gameusersdatalist = await gameuserslist.toArray();
+
+    const clockspipeline = [
+        {
+            $match: {
+                createdAt: { $lte: yesterday },
+                isowned: "1",
+                isequip: "1"
+            },
+        },
+        {
+            $group: {
+                _id: '$owner',
+                user: { $first: '$owner' },
+                totalDays: {
+                    $sum: {
+                        $trunc: {
+                            $divide: [
+                                { $subtract: [yesterday, '$createdAt'] },
+                                1000 * 60 * 60 * 24, // milliseconds to days conversion
+                            ],
+                        },
+                    },
+                },
+                type: { $first: "$type" }
+            },
+        },
+    ]
+
+    const clocksagg = await clocks.aggregate(clockspipeline)
+    
+    console.log("GETTING CLOCKS LIST")
+    const clocksdata = await clocksagg.toArray()
+
+    const toolspipeline = [
+        {
+            $match: {
+                createdAt: { $lte: yesterday },
+                isowned: "1",
+                isequip: "1",
+                type: { $ne: "1" }
+            },
+        },
+        {
+            $group: {
+                _id: '$owner',
+                user: { $first: '$owner' },
+                totalDays: {
+                    $sum: {
+                        $trunc: {
+                            $divide: [
+                                { $subtract: [yesterday, '$createdAt'] },
+                                1000 * 60 * 60 * 24, // milliseconds to days conversion
+                            ],
+                        },
+                    },
+                },
+                type: { $first: "$type" }
+            },
+        },
+    ]
+
+    const toolssagg = await equipment.aggregate(toolspipeline)
+    
+    console.log("GETTING TOOLS LIST")
+    const toolsdata = await toolssagg.toArray()
+
+    const cosmeticspipeline = [
+        {
+            $match: {
+                isequip: "1"
+            }
+        }
+    ]
+
+    const cosmeticssagg = await cosmetics.aggregate(cosmeticspipeline)
+    
+    console.log("GETTING COSMETICS LIST")
+    const cosmeticsdata = await cosmeticssagg.toArray()
+
+    const ingamegamespipeline = [
+        {
+            $match: {
+                status: "playing"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalHarvestMG: { $sum: '$harvestmg' }
+            }
+        }
+    ]
+
+    const gamesagg = await ingamegames.aggregate(ingamegamespipeline)
+    
+    console.log("GETTING IN GAME GAMES TOTAL HARVEST MG")
+    const gameshcdata = await gamesagg.toArray()
+
+    const mgfarmed = []
+
+    let webtotalmg = 0;
+
+    
+    console.log("SETTING UP QUERIES TO ALL USERS")
+    gameusersdatalist.forEach(users => {
+        let totalmgfarm = 0;
+        
+        clocksdata.forEach(clocksuser => {
+            if (clocksuser.user == (users._id).toString()){
+                totalmgfarm += (checkmgclock(clocksuser.type, users.subscription) * clocksuser.totalDays)
+            }
+        })
+
+        let cosmeticstype = ""
+
+        cosmeticsdata.forEach(cosmtcsdata => {
+            if (cosmtcsdata.owner == (users._id).toString()){
+                cosmeticstype = cosmtcsdata.name + cosmtcsdata.type
+            }
+        })
+
+        toolsdata.forEach(toolsuser => {
+            if (toolsuser.user == (users._id).toString()){
+                totalmgfarm += (checkmgtools(toolsuser.type, cosmeticstype) * toolsuser.totalDays)
+            }
+        })
+
+        mgfarmed.push({
+            updateOne: {
+                filter: { owner: users._id, wallettype: 'monstergemfarm'},
+                update: { amount: totalmgfarm }
+            }
+        })
+
+        webtotalmg += totalmgfarm
+    })
+
+    webtotalmg += gameshcdata[0].totalHarvestMG
+    
+    console.log("START SAVING")
+    await gamewallets.bulkWrite(mgfarmed)
+    await monmoncoins.updateOne({name: "Monster Gem"}, { $set: { amount: webtotalmg }})
+
+    console.log("DONE RECOMPUTE MG")
 }

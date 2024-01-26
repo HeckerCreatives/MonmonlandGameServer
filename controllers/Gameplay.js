@@ -2,7 +2,7 @@ const Ingamegames = require("../models/Games")
 const Playtimegrinding = require("../models/Playtimegrinding")
 const Energy = require("../models/Energy")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
-const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue, prizepooladd, fiestarewards } = require("../utils/Gameutils")
+const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue, prizepooladd, fiestarewards, getenergy } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
@@ -109,9 +109,11 @@ exports.playgame = async (req, res) => {
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type))
     
     //  Check energy
-    const energyamount = await Energy.findOne({owner: new mongoose.Types.ObjectId(id)})
-    .then(data => data)
-    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    const energyamount = await getenergy(id)
+
+    if (energyamount == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
 
     if (!energyamount){
         return res.json({message: "energynotexist"})
@@ -412,6 +414,20 @@ exports.startpalosebo = async (req, res) => {
         return res.json({message: "restricted"})
     }
 
+    const energyamount = await getenergy(id)
+
+    if (energyamount == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    if (!energyamount){
+        return res.json({message: "energynotexist"})
+    }
+
+    if (energyamount < 1){
+        return res.json({message: "notenoughenergy"})
+    }
+
     const palosebodata = await Palosebo.findOne({owner: new mongoose.Types.ObjectId(id)})
     .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
@@ -451,6 +467,17 @@ exports.startpalosebo = async (req, res) => {
     }
 
     await Palosebo.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {endttime: DateTimeGameExpirationMinutes(5), starttime: DateTimeServer()})
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
+        $set: {
+            amount: {
+                $max: [0, {
+                    $add: ["$amount", -1]
+                }]
+            }
+        }
+    }])
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
     const participation = await addpointswalletamount(id, "fiestaparticipation", 1)
@@ -554,6 +581,17 @@ exports.endpalosebo = async (req, res) => {
     await Palosebo.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {endttime: 0, starttime: 0})
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
+    const apadd = await addpointswalletamount(id, "activitypoints", 1)
+    const addlbpoints = await setleaderboard(id, 1)
+
+    if (apadd != "success"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    if (addlbpoints != "success"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
     return res.json({message: "success", data: finaldata})
 }
 
@@ -640,6 +678,20 @@ exports.startsupermonmon = async (req, res) => {
 
     if (pooldeets.subscription == "Pearl"){
         return res.json({message: "restricted"})
+    }
+
+    const energyamount = await getenergy(id)
+
+    if (energyamount == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    if (!energyamount){
+        return res.json({message: "energynotexist"})
+    }
+
+    if (energyamount < 1){
+        return res.json({message: "notenoughenergy"})
     }
 
     const supermonmondata = await Supermonmon.findOne({owner: new mongoose.Types.ObjectId(id)})
@@ -772,6 +824,17 @@ exports.endsupermonmon = async (req, res) => {
 
     await Supermonmon.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {starttime: 0})
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    const apadd = await addpointswalletamount(id, "activitypoints", 1)
+    const addlbpoints = await setleaderboard(id, 1)
+
+    if (apadd != "success"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    if (addlbpoints != "success"){
+        return res.status(400).json({ message: "bad-request" })
+    }
 
     const finaldata = {
         prizes: {
