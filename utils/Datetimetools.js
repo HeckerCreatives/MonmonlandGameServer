@@ -86,3 +86,7 @@ exports.UnixtimeToDateTime = (unixTimestamp) => {
 
     return formattedDateTime;
 }
+
+exports.AddUnixtimeDay = (unixtime, daystoadd) => {
+    return unixtime + (daystoadd * 24 * 60 * 60);
+}

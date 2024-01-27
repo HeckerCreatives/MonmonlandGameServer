@@ -6,8 +6,8 @@ const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, 
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
-const { DateTimeGameExpiration, DateTimeServer, CalculateSecondsBetween, UnixtimeToDateTime, DateTimeGameExpirationMinutes } = require("../utils/Datetimetools")
-const { addwalletamount, addpointswalletamount, checkmcwalletamount } = require("../utils/Walletutils")
+const { DateTimeGameExpiration, DateTimeServer, CalculateSecondsBetween, UnixtimeToDateTime, DateTimeGameExpirationMinutes, AddUnixtimeDay, DateTimeServerExpiration } = require("../utils/Datetimetools")
+const { addwalletamount, addpointswalletamount, checkmcwalletamount, getwalletamount } = require("../utils/Walletutils")
 const { default: mongoose } = require("mongoose")
 const { setleaderboard, setfiestaleaderboard } = require("../utils/Leaderboards")
 const { checkmaintenance } = require("../utils/Maintenance")
@@ -17,6 +17,9 @@ const EnergyInventory = require("../models/Energyinventory")
 const Fiesta = require("../models/Fiesta")
 const Prizepools = require("../models/Prizepools")
 const Palosebo = require("../models/Palosebo")
+const Gamewallet = require("../models/Wallets")
+const Sponsorlist = require("../models/Sponsorlist")
+const Cosmetics = require("../models/Cosmetics")
 
 exports.playgame = async (req, res) => {
     const { id } = req.user
@@ -905,26 +908,211 @@ exports.playsponsor = async (req, res) => {
     return res.json({message: "success"})
 }
 
-// exports.startsponsor = async (req, res) => {
+exports.startsponsor = async (req, res) => {
+    const { id } = req.user
 
-//     const maintenance = await checkmaintenance("maintenancesponsor")
+    const maintenance = await checkmaintenance("maintenancesponsor")
 
-//     if (maintenance == "1") {
-//         return res.json({message: "maintenance"})
-//     }
+    if (maintenance == "1") {
+        return res.json({message: "maintenance"})
+    }
 
-//     const pooldeets = await getpooldetails(id)
+    const pooldeets = await getpooldetails(id)
 
-//     if (pooldeets == "erroraccount"){
-//         return res.json({message: "erroraccount"})
-//     }
-//     else if (pooldeets == "bad-request"){
-//         return res.status(400).json({message: "bad-request"})
-//     }
+    if (pooldeets == "erroraccount"){
+        return res.json({message: "erroraccount"})
+    }
+    else if (pooldeets == "bad-request"){
+        return res.status(400).json({message: "bad-request"})
+    }
 
-//     if (pooldeets.subscription == "Pearl"){
-//         return res.json({message: "restricted"})
-//     }
+    if (pooldeets.subscription == "Pearl"){
+        return res.json({message: "restricted"})
+    }
 
+    const prizelist = await Sponsorlist.find()
+    .then(data => data)
+    .catch(err => {
+        return res.status(400).json({ message: "bad-request", data: err.message })
+    })
 
-// }
+    if (prizelist.length <= 0){
+        return res.json({message: "noprizelist"})
+    }
+
+    const finalprizelist = []
+
+    prizelist.forEach(data => {
+        if (data.isprize == "1"){
+            finalprizelist.push(data)
+        }
+    })
+
+    if (finalprizelist.length <= 0){
+        return res.json({message: "noprizelist"})
+    }
+
+    const mgunilevel = await getwalletamount(id, "monstergemunilevel")
+    const mgfarm = await getwalletamount(id, "monstergemfarm")
+    const balance = await getwalletamount(id, "balance")
+
+    if (mgunilevel == "bad-request"){
+        return res.json({message: "bad-request"})
+    }
+
+    if (mgfarm == "bad-request"){
+        return res.json({message: "bad-request"})
+    }
+
+    if (balance == "bad-request"){
+        return res.json({message: "bad-request"})
+    }
+
+    let notyetreduce = true;
+
+    if (mgunilevel.amount >= 1){
+        notyetreduce = false;
+        
+        await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: "monstergemunilevel"}, {$inc: {amount: -1}})
+        .catch(err => {
+            return res.status(400).json({ message: "bad-request", data: err.message })
+        })
+    }
+
+    if (notyetreduce){
+        if (mgfarm.amount >= 1){
+            notyetreduce = false;
+            
+            await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: "monstergemfarm"}, {$inc: {amount: -1}})
+            .catch(err => {
+                return res.status(400).json({ message: "bad-request", data: err.message })
+            })
+        }
+    }
+
+    if (notyetreduce){
+        if (balance.amount >= 1){
+            notyetreduce = false;
+            
+            await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: "balance"}, {$inc: {amount: -1}})
+            .catch(err => {
+                return res.status(400).json({ message: "bad-request", data: err.message })
+            })
+        }
+    }
+
+    if (notyetreduce){
+        return res.json({message: "notenoughbalance"})
+    }
+
+    const adminsponsorwallet = await addwalletamount(process.env.MONMONLAND_ID, "sponsorwallet", 1)
+
+    if (adminsponsorwallet == "bad-request"){
+        return res.json({message: "bad-request"})
+    }
+
+    const randomNumber = Math.floor(Math.random() * 100) + 1;
+
+    let prizeindex = 0;
+    let cumulativeChance = 0;
+    let chosenprice;
+
+    for (const { percentage } of finalprizelist){
+        cumulativeChance += percentage;
+
+        if (randomNumber <= cumulativeChance){
+            chosenprice = finalprizelist[prizeindex]
+
+            break;
+        }
+
+        prizeindex++;
+    }
+
+    if (chosenprice == null){
+        return res.json({message: "noprize"})
+    }
+
+    if (chosenprice.itemtype == "cosmetics"){
+
+        const isexist = await Cosmetics.findOne({name: chosenprice.itemid})
+        .then(data => data)
+
+        if (isexist){
+            if (chosenprice.itemid == "Energy"){
+                const time = AddUnixtimeDay(isexist.expiration, chosenprice.expiration)
+
+                await Cosmetics.findOne({name: chosenprice.itemid, type: "ring"}, {expiration: time})
+                .catch(err => {
+                    return res.status(400).json({ message: "bad-request", data: err.message })
+                })
+            }
+        }
+        else{
+            await Cosmetics.create({name: chosenprice.itemid, type: "ring", expiration: DateTimeServerExpiration(chosenprice.expiration)})
+            .catch(err => {
+                return res.status(400).json({ message: "bad-request", data: err.message })
+            })
+        }
+    }
+
+    if (chosenprice.itemtype == "balance"){
+        const addbalance = await addwalletamount(id, "balance", chosenprice.amount)
+
+        if (addbalance == "bad-request"){
+            return res.json({message: "bad-request"})
+        }
+    }
+
+    if (chosenprice.itemtype == "energy"){
+        await EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid, type: "energy"})
+        .then(async dataenergy => {
+            if (!dataenergy){
+                await EnergyInventory.create({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid, type: "energy", amount: chosenprice.qty, consumableamount: checkenergyinventoryconsumable(`${chosenprice.itemid}${"energy"}`)})
+                .catch(err => {
+                    return res.status(400).json({ message: "bad-request", data: err.message })
+                })
+
+                return
+            }
+
+            await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid, type: "energy"}, {$inc: { amount: chosenprice.qty }})
+            .catch(err => {
+                return res.status(400).json({ message: "bad-request", data: err.message })
+            })
+        })
+        .catch(err => {
+            return res.status(400).json({ message: "bad-request", data: err.message })
+        })
+    }
+
+    if (chosenprice.itemtype == "monstercoin"){
+        const mcadd = await addwalletamount(id, "monstercoin", chosenprice.amount)
+
+        if (mcadd == "bad-request"){
+            return res.json({message: "bad-request"})
+        }
+    }
+
+    if (chosenprice.itemtype == "button"){
+        const buttons = await Gameunlock.findOne({type: chosenprice.itemid})
+        .then(data => data)
+        .catch(err => {
+            return res.status(400).json({ message: "bad-request", data: err.message })
+        })
+
+        if (!buttons){
+            await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: chosenprice.itemid, value: "1"})
+            .catch(err => {
+                return res.status(400).json({ message: "bad-request", data: err.message })
+            })
+        }
+    }
+
+    let finaldata = {
+        itemnumber: chosenprice.itemnumber,
+        itemname: chosenprice.itemname
+    }
+
+    return res.json({message: "success", data: finaldata})
+}

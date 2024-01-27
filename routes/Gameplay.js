@@ -1,5 +1,5 @@
 const router = require("express").Router()
-const { playgame, getgames, claimgame, playpalosebo, playsupermonmon, playsponsor, startsupermonmon, endsupermonmon, supermonmonleaderboard, startpalosebo, endpalosebo, paloseboleaderboard } = require("../controllers/Gameplay")
+const { playgame, getgames, claimgame, playpalosebo, playsupermonmon, playsponsor, startsupermonmon, endsupermonmon, supermonmonleaderboard, startpalosebo, endpalosebo, paloseboleaderboard, startsponsor } = require("../controllers/Gameplay")
 const { protectplayer } = require("../middleware/middleware")
 
 router
@@ -15,5 +15,6 @@ router
     .get("/startpalosebo", protectplayer, startpalosebo)
     .post("/endpalosebo", protectplayer, endpalosebo)
     .get("/paloseboleaderboard", protectplayer, paloseboleaderboard)
+    .get("/startsponsor", protectplayer, startsponsor)
 
 module.exports = router;
