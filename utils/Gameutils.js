@@ -10,7 +10,7 @@ const { default: mongoose } = require("mongoose")
 exports.checkmgtools = (tooltype, cosmetics) => {
     let mgamount = 0;
     
-    if (cosmetics == "Diamondring"){
+    if (cosmetics == "Diamondring" || cosmetics == "Energyring"){
         switch(tooltype) {
             case "2":
                 mgamount = 0.35;
