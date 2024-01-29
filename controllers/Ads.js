@@ -48,12 +48,10 @@ exports.claimads = async (req, res) => {
             case "2":
                 itemname = "2"
                 itemtype = "energy"
-                qty = 2
                 break;
             case "3":
                 itemname = "3"
                 itemtype = "energy"
-                qty = 3
                 break;
             case "4":
                 itemname = "4"
