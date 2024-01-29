@@ -5,6 +5,7 @@ const { sendmgtounilevel, checkwalletamount, rebatestowallet } = require("../uti
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 const { computemerchcomplan } = require("../webutils/Communityactivityutils")
 const { checkmaintenance } = require("../utils/Maintenance")
+const { addanalytics } = require("../utils/Analytics")
 
 exports.gettools = async (req, res) => {
     const { id } = req.user
