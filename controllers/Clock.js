@@ -117,15 +117,15 @@ exports.buyclocks = async (req, res) => {
         .then(async () => {
 
             const complan = await computemerchcomplan(clocksamount, "clock")
-            const rebates = await rebatestowallet(id, "balance", clocksamount * 0.05, "Clocks")
+            // const rebates = await rebatestowallet(id, "balance", clocksamount * 0.05, "Clocks")
 
             if (complan != "success"){
                 res.status(400).json({ message: "bad-request" })
             }
 
-            if (rebates != "success"){
-                res.status(400).json({ message: "bad-request" })
-            }
+            // if (rebates != "success"){
+            //     res.status(400).json({ message: "bad-request" })
+            // }
 
             const analyticsadd = await addanalytics(id, `Buy Clock (${clockstype})`, clocksamount)
 

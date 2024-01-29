@@ -6,17 +6,17 @@ exports.computecomplan = async (amount) => {
 
     let response = ""
                 
-    const complan = (amount * 0.25)
-    const leaderboards = (amount * 0.03)
-    const grinding = (amount * 0.30)
-    const diamondpools = (amount * 0.02)
-    const devsshare = (amount * 0.05)
-    const companyshare = (amount * 0.05)
-    const officers = (amount * 0.10)
-    const marketing = (amount * 0.03)
-    const incentives = (amount * 0.02)
+    const complan = (amount * 0.40)
+    const leaderboards = (amount * 0.02)
+    const grinding = (amount * 0.20)
     const monstergem = (amount * 0.15)
-    const tradepayin = (amount * 0.0)
+    const diamondpools = (amount * 0.01)
+    const incentives = (amount * 0.03)
+    const marketing = (amount * 0.02)
+    const tradepayin = (amount * 0.02)
+    const officers = (amount * 0.08)
+    const devsshare = (amount * 0.05)
+    const companyshare = (amount * 0.02)
 
     const bulkOperations = [
         {
@@ -107,17 +107,17 @@ exports.computemerchcomplan = async (amount, itemtype) => {
         return
     })
                 
-    const complan = (amount * 0.22)
+    const complan = (amount * 0.30)
     const leaderboards = (amount * 0.03)
-    const grinding = (amount * 0.15)
-    const diamondpools = (amount * 0.03)
-    const devsshare = (amount * 0.05)
-    const companyshare = (amount * 0.05)
-    const officers = (amount * 0.10)
+    const grinding = (amount * 0.20)
+    const monstergem = (amount * 0.30)
+    const diamondpools = (amount * 0.02)
+    const incentives = (amount * 0.02)
     const marketing = (amount * 0.01)
-    const incentives = (amount * 0.01)
-    const monstergem = (amount * 0.35)
     const tradepayin = (amount * 0.0)
+    const officers = (amount * 0.05)
+    const devsshare = (amount * 0.05)
+    const companyshare = (amount * 0.02)
 
     const bulkOperations = [
         {
@@ -208,17 +208,17 @@ exports.computeshopcomplan = async (amount, itemtype) => {
         return
     })
 
-    const complan = (amount * 0.17)
+    const complan = (amount * 0.30)
     const leaderboards = (amount * 0.03)
-    const grinding = (amount * 0.15)
-    const diamondpools = (amount * 0.03)
-    const devsshare = (amount * 0.05)
-    const companyshare = (amount * 0.05)
-    const officers = (amount * 0.10)
+    const grinding = (amount * 0.20)
+    const monstergem = (amount * 0.30)
+    const diamondpools = (amount * 0.02)
+    const incentives = (amount * 0.02)
     const marketing = (amount * 0.01)
-    const incentives = (amount * 0.01)
-    const monstergem = (amount * 0.40)
     const tradepayin = (amount * 0.0)
+    const officers = (amount * 0.05)
+    const devsshare = (amount * 0.05)
+    const companyshare = (amount * 0.02)
 
     const bulkOperations = [
         {
