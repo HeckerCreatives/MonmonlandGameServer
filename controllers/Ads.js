@@ -4,26 +4,26 @@ const { setleaderboard } = require("../utils/Leaderboards")
 const { default: mongoose } = require("mongoose")
 const { checkenergyinventoryconsumable } = require("../utils/Energyutils")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
-const { checkdailylimitwallet } = require("../utils/Dailylimits")
+const { checkdailylimitwallet, dailylimitadd } = require("../utils/Dailylimits")
 
 exports.claimads = async (req, res) => {
     const { id } = req.user
     const { adstype } = req.body
 
-    const dailylimit = await checkdailylimitwallet(id, "watchads")
-
-    if (dailylimit == "bad-request"){
-        return res.status(400).json({ message: "bad-request" })
-    }
-
-    if (dailylimit.amount < 5){
-        
-    }
-
     if (adstype >= 1 && adstype <= 5){
         let itemname = ""
         let itemtype = ""
         let qty = 1
+
+        const dailylimit = await checkdailylimitwallet(id, `${adstype}watchads`)
+
+        if (dailylimit == "bad-request"){
+            return res.status(400).json({ message: "bad-request" })
+        }
+
+        if (dailylimit.amount >= 20){
+            return res.json({message: "limitreached"})
+        }
 
         const pooldeets = await getpooldetails(id)
 
@@ -105,7 +105,14 @@ exports.claimads = async (req, res) => {
         .then(async dataenergy => {
             if (!dataenergy){
                 await EnergyInventory.create({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype, amount: qty, consumableamount: checkenergyinventoryconsumable(`${itemname}${itemtype}`)})
-                .then(() => {
+                .then(async data => {
+                    
+                    const adddailylimit = await dailylimitadd(id, `${adstype}watchads`, 1)
+
+                    if (adddailylimit == "bad-request"){
+                        return res.json({message: "bad-request"})
+                    }
+                    
                     res.json({message: "success"})
                 })
                 .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
@@ -113,7 +120,14 @@ exports.claimads = async (req, res) => {
                 return
             }
             await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype}, {$inc: { amount: qty }})
-            .then(() => {
+            .then(async data => {
+
+                const adddailylimit = await dailylimitadd(id, `${adstype}watchads`, 1)
+
+                if (adddailylimit == "bad-request"){
+                    return res.json({message: "bad-request"})
+                }
+
                 res.json({message: "success"})
             })
             .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))

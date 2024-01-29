@@ -7,6 +7,8 @@ exports.checkdailylimitwallet = async(id, type) => {
     .catch(() => "bad-request")
 }
 
-exports.watchadsdailylimit = async(subscription) => {
-
+exports.dailylimitadd = async(id, type, amount) => {
+    return await Dailylimit.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), wallettype: type}, {$inc: {amount: amount}})
+    .then(() => "success")
+    .catch(() => "bad-request")
 }

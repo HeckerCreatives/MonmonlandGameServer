@@ -304,7 +304,7 @@ exports.getfarm = (timestarted, unixtime, maxtotal) => {
     const totalFarmingDuration = expirationTime - startTime;
 
     // Calculate coins per hour
-    const coinsPerHour = (maxTotalCoins / (totalFarmingDuration / 3600)).toFixed(2);
+    const coinsPerHour = (maxTotalCoins / (totalFarmingDuration / 3600));
 
     // Calculate current time between start time and expiration time in seconds
     const currentTimeBetween = Math.min(currentTime - startTime, totalFarmingDuration); // Consider current time up to expiration

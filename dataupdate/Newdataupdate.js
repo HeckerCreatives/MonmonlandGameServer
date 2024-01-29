@@ -617,15 +617,53 @@ exports.dailylimtads = async() => {
 
     userlist.forEach(data => {
         
-        dailylimitschemasBulkWrite.push({
-            insertOne: {
-                document: {
-                    owner: new mongoose.Types.ObjectId(data._id),
-                    wallettype: "watchads",
-                    amount: 0
+        dailylimitschemasBulkWrite.push(
+            {
+                insertOne: {
+                    document: {
+                        owner: new mongoose.Types.ObjectId(data._id),
+                        wallettype: "1watchads",
+                        amount: 0
+                    }
+                }
+            },
+            {
+                insertOne: {
+                    document: {
+                        owner: new mongoose.Types.ObjectId(data._id),
+                        wallettype: "2watchads",
+                        amount: 0
+                    }
+                }
+            },
+            {
+                insertOne: {
+                    document: {
+                        owner: new mongoose.Types.ObjectId(data._id),
+                        wallettype: "3watchads",
+                        amount: 0
+                    }
+                }
+            },
+            {
+                insertOne: {
+                    document: {
+                        owner: new mongoose.Types.ObjectId(data._id),
+                        wallettype: "4watchads",
+                        amount: 0
+                    }
+                }
+            },
+            {
+                insertOne: {
+                    document: {
+                        owner: new mongoose.Types.ObjectId(data._id),
+                        wallettype: "5watchads",
+                        amount: 0
+                    }
                 }
             }
-        })
+        )
     })
 
     await dailylimitschemas.bulkWrite(dailylimitschemasBulkWrite)

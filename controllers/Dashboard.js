@@ -8,6 +8,7 @@ const Walletscutoff = require("../models/Walletscutoff")
 const Monmoncoin = require("../modelweb/Monmoncoin")
 const Investorfunds = require("../modelweb/Investorfunds")
 const Wallethistory = require("../models/Wallethistory")
+const Dailylimit = require("../models/Dailylimit")
 const { default: mongoose } = require("mongoose")
 const { DateTimeServer } = require("../utils/Datetimetools")
 
@@ -119,6 +120,17 @@ exports.dashboardplayer = async (req, res) => {
 
     data["tools"] = !tools ? "0" : "1"
     data["datetime"] = DateTimeServer()
+
+    const dailylimitlist = await Dailylimit.find({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    data["dailylimit"] = {}
+    dailylimitlist.forEach(datalist => {
+        const { wallettype, amount } = datalist
+
+        data.dailylimit[wallettype] = amount
+    })
 
     res.json({message: "success", data: data})
 }
