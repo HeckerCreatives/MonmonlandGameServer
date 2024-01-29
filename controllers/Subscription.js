@@ -6,6 +6,7 @@ const SubsAccumulated = require("../modelweb/SubsAccumulated")
 const { default: mongoose } = require("mongoose")
 const { checkmaintenance } = require("../utils/Maintenance")
 const { addtototalfarmmc } = require("../utils/Gameutils")
+const { addanalytics } = require("../utils/Analytics")
 
 exports.buysubscription = async (req, res) => {
     const { id } = req.user
@@ -107,7 +108,13 @@ exports.buysubscription = async (req, res) => {
             }
 
             await SubsAccumulated.findOneAndUpdate({subsname: substype.toLowerCase()}, {$inc: {amount: finalsubsamount}})
-            .then(() => {
+            .then(async () => {
+                const analyticsadd = await addanalytics(id, `Buy Subscription (${substype})`, finalamount)
+
+                if (analyticsadd == "bad-request"){
+                    return res.status(400).json({ message: "bad-request" })
+                }
+
                 return res.json({message: "success"})
             })
             .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))

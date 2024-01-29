@@ -6,6 +6,7 @@ const { checkenergyringequip, checkequipring } = require("../utils/Cosmeticutils
 const { checkmcwalletamount } = require("../utils/Walletutils")
 const { checkenergyinventoryprice, checkenergyinventoryconsumable } = require("../utils/Energyutils")
 const { checkmaintenance } = require("../utils/Maintenance")
+const { addanalytics } = require("../utils/Analytics")
 
 exports.getenergyinventory = (req, res) => {
     const { id } = req.user
@@ -157,7 +158,15 @@ exports.buyenergyinventory = async (req, res) => {
     .then(async dataenergy => {
         if (!dataenergy){
             await EnergyInventory.create({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype, amount: qty, consumableamount: checkenergyinventoryconsumable(`${itemname}${itemtype}`)})
-            .then(() => {
+            .then(async () => {
+                
+    
+                const analyticsadd = await addanalytics(id, "Buy Energy", finalamount)
+
+                if (analyticsadd == "bad-request"){
+                    return res.status(400).json({ message: "bad-request" })
+                }
+
                 res.json({message: "success"})
             })
             .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
@@ -166,7 +175,13 @@ exports.buyenergyinventory = async (req, res) => {
         }
 
         await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: itemname, type: itemtype}, {$inc: { amount: qty }})
-        .then(() => {
+        .then(async () => {
+            const analyticsadd = await addanalytics(id, `Buy Energy (${itemname})`, finalamount)
+
+            if (analyticsadd == "bad-request"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+
             res.json({message: "success"})
         })
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))

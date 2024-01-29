@@ -20,6 +20,7 @@ const Palosebo = require("../models/Palosebo")
 const Gamewallet = require("../models/Wallets")
 const Sponsorlist = require("../models/Sponsorlist")
 const Cosmetics = require("../models/Cosmetics")
+const GrindingHistory = require("../models/Grindinghistory")
 
 exports.playgame = async (req, res) => {
     const { id } = req.user
@@ -361,6 +362,8 @@ exports.claimgame = async (req, res) => {
         if (addlbpoints != "success"){
             return res.status(400).json({ message: "bad-request" })
         }
+
+        await GrindingHistory.create({owner: new mongoose.Types.ObjectId(id), timestarted: game.timestarted, endttime: game.unixtime, harvestmc: totalMCFarmed, harvestmg: totalMGFarmed, harvestap: totalAPFarmed})
 
         finaldata = {
             datetime: DateTimeServer()

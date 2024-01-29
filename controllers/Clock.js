@@ -5,6 +5,7 @@ const { sendmgtounilevel, checkwalletamount, rebatestowallet } = require("../uti
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 const { computemerchcomplan } = require("../webutils/Communityactivityutils")
 const { checkmaintenance } = require("../utils/Maintenance")
+const { addanalytics } = require("../utils/Analytics")
 
 exports.getclock = async (req, res) => {
     const { id } = req.user
@@ -124,6 +125,12 @@ exports.buyclocks = async (req, res) => {
 
             if (rebates != "success"){
                 res.status(400).json({ message: "bad-request" })
+            }
+
+            const analyticsadd = await addanalytics(id, `Buy Clock (${clockstype})`, clocksamount)
+
+            if (analyticsadd == "bad-request"){
+                return res.status(400).json({ message: "bad-request" })
             }
             
             return res.json({message: "success"})

@@ -5,6 +5,7 @@ const { sendmgtounilevel, checkwalletamount } = require("../utils/Walletutils")
 const { DateTimeServerExpiration } = require("../utils/Datetimetools")
 const { checkmaintenance } = require("../utils/Maintenance")
 const { computeshopcomplan } = require("../webutils/Communityactivityutils")
+const { addanalytics } = require("../utils/Analytics")
 
 exports.getcosmetics = async (req, res) => {
     const { id } = req.user
@@ -117,6 +118,12 @@ exports.buycosmetics = async (req, res) => {
 
             if (complan != "success"){
                 res.status(400).json({ message: "bad-request" })
+            }
+
+            const analyticsadd = await addanalytics(id, `Buy Cosmetics (${cosmeticstype})`, cosmeticsamount)
+
+            if (analyticsadd == "bad-request"){
+                return res.status(400).json({ message: "bad-request" })
             }
 
             return res.json({message: "success"})
