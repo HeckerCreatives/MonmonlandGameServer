@@ -427,7 +427,7 @@ exports.startpalosebo = async (req, res) => {
         return res.json({message: "energynotexist"})
     }
 
-    if (energyamount < 1){
+    if (energyamount < 5){
         return res.json({message: "notenoughenergy"})
     }
 
@@ -453,13 +453,13 @@ exports.startpalosebo = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
     
-    const minus = await minustototalcoins("Monster Coin", 1)
+    const minus = await minustototalcoins("Monster Coin", 3)
     
     if (minus != "success"){
         return res.status(400).json({ message: "bad-request" })
     }
 
-    const addtoprizepools = await prizepooladd(9, "palosebo")
+    const addtoprizepools = await prizepooladd(7, "palosebo")
 
     if (addtoprizepools == "notexist"){
         return res.json({message: "notexist"})
@@ -476,7 +476,7 @@ exports.startpalosebo = async (req, res) => {
         $set: {
             amount: {
                 $max: [0, {
-                    $add: ["$amount", -1]
+                    $add: ["$amount", -5]
                 }]
             }
         }
@@ -719,13 +719,13 @@ exports.startsupermonmon = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
     
-    const minus = await minustototalcoins("Monster Coin", 1)
+    const minus = await minustototalcoins("Monster Coin", 3)
     
     if (minus != "success"){
         return res.status(400).json({ message: "bad-request" })
     }
 
-    const addtoprizepools = await prizepooladd(9, "supermonmon")
+    const addtoprizepools = await prizepooladd(7, "supermonmon")
 
     if (addtoprizepools == "notexist"){
         return res.json({message: "notexist"})
@@ -736,6 +736,17 @@ exports.startsupermonmon = async (req, res) => {
     }
     
     await Supermonmon.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {starttime: DateTimeServer()})
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
+        $set: {
+            amount: {
+                $max: [0, {
+                    $add: ["$amount", -5]
+                }]
+            }
+        }
+    }])
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
     
     const participation = await addpointswalletamount(id, "fiestaparticipation", 1)

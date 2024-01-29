@@ -321,11 +321,12 @@ exports.fiestarewards = async () => {
     const randomNumber = Math.floor(Math.random() * 100) + 1;
 
     const chances = [
-        { name: "1", type: "energy", chance: 80 },
-        { name: "2", type: "energy", chance: 9 },
-        { name: "3", type: "energy", chance: 5 },
-        { name: "5", type: "monster coin", chance: 3 },
-        { name: "10", type: "monster coin", chance: 2 },
+        // { name: "1", type: "energy", chance: 80 },
+        // { name: "2", type: "energy", chance: 9 },
+        // { name: "3", type: "energy", chance: 5 },
+        { name: "5", type: "monster coin", chance: 80 },
+        { name: "10", type: "monster coin", chance: 10 },
+        { name: "15", type: "monster coin", chance: 9 },
         { name: "20", type: "monster coin", chance: 1 },
     ];
 
