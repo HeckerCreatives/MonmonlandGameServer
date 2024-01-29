@@ -577,3 +577,58 @@ exports.recomputemg = async() => {
 
     console.log("DONE RECOMPUTE MG")
 }
+
+exports.dailylimtads = async() => {
+    const client = await connecttodatabase();
+    const database = client.db()
+
+    const gameusers = database.collection("gameusers")
+    const dailylimitschemas = database.collection("dailylimitschemas")
+
+    const userlistpipeline = [
+        {
+            $lookup: {
+                from: "dailylimitschemas", // Use the actual collection name
+                localField: "_id",
+                foreignField: "owner",
+                as: "dailylimit"
+            }
+        },
+        {
+            $match: {
+                $and: [
+                    { "dailylimit": { $exists: true } },
+                    {
+                        "dailylimit": {
+                            $not: {
+                                $elemMatch: { wallettype: "watchads" }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+
+    const gameuserlist = await gameusers.aggregate(userlistpipeline)
+    const userlist = await gameuserlist.toArray()
+
+    const dailylimitschemasBulkWrite = []
+
+    userlist.forEach(data => {
+        
+        dailylimitschemasBulkWrite.push({
+            insertOne: {
+                document: {
+                    owner: new mongoose.Types.ObjectId(data._id),
+                    wallettype: "watchads",
+                    amount: 0
+                }
+            }
+        })
+    })
+
+    await dailylimitschemas.bulkWrite(dailylimitschemasBulkWrite)
+
+    console.log("done creating limit ads")
+}

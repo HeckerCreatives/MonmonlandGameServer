@@ -1,3 +1,3 @@
-const { Tasksdataupdate, TaskGameUnlockUpdate, AddMissingTaskToUser, addsupermonmonuserdata, addpalosebodata, recomputemg } = require("./dataupdate/Newdataupdate")
+const { Tasksdataupdate, TaskGameUnlockUpdate, AddMissingTaskToUser, addsupermonmonuserdata, addpalosebodata, recomputemg,dailylimtads } = require("./dataupdate/Newdataupdate")
 
-Tasksdataupdate()
+dailylimtads()

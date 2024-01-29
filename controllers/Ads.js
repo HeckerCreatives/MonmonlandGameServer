@@ -4,10 +4,21 @@ const { setleaderboard } = require("../utils/Leaderboards")
 const { default: mongoose } = require("mongoose")
 const { checkenergyinventoryconsumable } = require("../utils/Energyutils")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
+const { checkdailylimitwallet } = require("../utils/Dailylimits")
 
 exports.claimads = async (req, res) => {
     const { id } = req.user
     const { adstype } = req.body
+
+    const dailylimit = await checkdailylimitwallet(id, "watchads")
+
+    if (dailylimit == "bad-request"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    if (dailylimit.amount < 5){
+        
+    }
 
     if (adstype >= 1 && adstype <= 5){
         let itemname = ""
@@ -110,6 +121,6 @@ exports.claimads = async (req, res) => {
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
     }
     else{
-        res.status(400).json({ message: "bad-request" })
+        return res.status(400).json({ message: "bad-request" })
     }
 }
