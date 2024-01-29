@@ -2,7 +2,7 @@ const Ingamegames = require("../models/Games")
 const Playtimegrinding = require("../models/Playtimegrinding")
 const Energy = require("../models/Energy")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
-const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue, prizepooladd, fiestarewards, getenergy } = require("../utils/Gameutils")
+const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue, prizepooladd, fiestarewards, getenergy, energygrindconsumption } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
@@ -122,7 +122,7 @@ exports.playgame = async (req, res) => {
         return res.json({message: "energynotexist"})
     }
 
-    const energyconsumption = clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type)
+    const energyconsumption = energygrindconsumption(clocksequip?.type == null ? 0 : clocksequip.type)
 
     if (cosmeticequip){
         if (cosmeticequip.name != "Energy"){

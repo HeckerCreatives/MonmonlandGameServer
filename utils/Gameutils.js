@@ -120,6 +120,18 @@ exports.clockhoursadd = (clocktype) => {
     return clockhours[clocktype] || 3
 }
 
+exports.energygrindconsumption = (clocktype) => {
+
+    const clockhours = {
+        1: 12,
+        2: 18,
+        3: 24,
+        4: 30
+    }
+
+    return clockhours[clocktype] || 6
+}
+
 exports.mcmined = (toolstype, clocktype) => {
     let amount = 0;
     const mcamount = exports.clockhoursadd(clocktype)
