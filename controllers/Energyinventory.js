@@ -62,16 +62,16 @@ exports.useenergyinventory = async (req, res) => {
 
     switch(subslevel){
         case "Pearl":
-            finalmaxenergy = 10
-            break;
-        case "Ruby":
             finalmaxenergy = 20
             break;
-        case "Emerald":
+        case "Ruby":
             finalmaxenergy = 40
             break;
-        case "Diamond":
+        case "Emerald":
             finalmaxenergy = 80
+            break;
+        case "Diamond":
+            finalmaxenergy = 150
             break;
         default:
             finalmaxenergy = 0

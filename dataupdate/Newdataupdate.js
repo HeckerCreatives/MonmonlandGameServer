@@ -10,10 +10,35 @@ exports.Tasksdataupdate = async () => {
     const walletscutoff = database.collection("walletscutoffs")
     const gamewallets = database.collection("gamewallets")
 
-    const users = gameusers.find()
+    const userlistpipeline = [
+        {
+            $lookup: {
+                from: "walletscutoffs", // Use the actual collection name
+                localField: "_id",
+                foreignField: "owner",
+                as: "walletData"
+            }
+        },
+        {
+            $match: {
+                $and: [
+                    { "walletData": { $exists: true } },
+                    {
+                        "walletData": {
+                            $not: {
+                                $elemMatch: { wallettype: "fiestaparticipation" }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
 
-    const userlist = await users.toArray()
+    const gameuserlist = await gameusers.aggregate(userlistpipeline)
+    const userlist = await gameuserlist.toArray()
 
+    // console.log(userlist)
     const walletscutoffBulkWrite = []
     const gamewalletsBulkWrite = []
 
