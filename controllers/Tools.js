@@ -124,6 +124,12 @@ exports.buytools = async (req, res) => {
             if (rebates != "success"){
                 res.status(400).json({ message: "bad-request" })
             }
+
+            const analyticsadd = await addanalytics(id, `Buy Tools (${toolstype})`, toolsamount)
+
+            if (analyticsadd == "bad-request"){
+                return res.status(400).json({ message: "bad-requestasdfasd" })
+            }
             
             return res.json({message: "success"})
         })
