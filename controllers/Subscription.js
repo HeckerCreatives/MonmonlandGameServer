@@ -109,10 +109,10 @@ exports.buysubscription = async (req, res) => {
 
             await SubsAccumulated.findOneAndUpdate({subsname: substype.toLowerCase()}, {$inc: {amount: finalsubsamount}})
             .then(async () => {
-                const analyticsadd = await addanalytics(id, `Buy Subscription (${substype})`, finalamount)
+                const analyticsadd = await addanalytics(id, `Buy Subscription (${substype})`, finalsubsamount)
 
                 if (analyticsadd == "bad-request"){
-                    return res.status(400).json({ message: "bad-request" })
+                    return res.status(400).json({ message: "bad-requestasdfasd" })
                 }
 
                 return res.json({message: "success"})
