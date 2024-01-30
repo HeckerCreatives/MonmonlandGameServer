@@ -262,7 +262,7 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
                 case "Pearl":
                     pointsamount = 0
                     break;
-                case "Ruby":S
+                case "Ruby":
                     pointsamount = 2
                     break;
                 case "Emerald":
