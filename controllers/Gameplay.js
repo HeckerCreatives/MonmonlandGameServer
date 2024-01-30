@@ -907,6 +907,8 @@ exports.playsponsor = async (req, res) => {
     if (maintenance == "1") {
         return res.json({message: "maintenance"})
     }
+    
+    const pooldeets = await getpooldetails(id)
 
     if (pooldeets == "erroraccount"){
         return res.json({message: "erroraccount"})
