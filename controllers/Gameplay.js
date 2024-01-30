@@ -420,19 +420,41 @@ exports.startpalosebo = async (req, res) => {
         return res.json({message: "restricted"})
     }
 
-    const energyamount = await getenergy(id)
+    const cosmeticequip = await checkcosmeticequip(id)
 
-    if (energyamount == "bad-request"){
-        return res.status(400).json({ message: "bad-request" })
-    }
+    if (cosmeticequip){
+        if (cosmeticequip.name != "Energy"){
+            const energyamount = await getenergy(id)
 
-    if (!energyamount){
-        return res.json({message: "energynotexist"})
-    }
+            if (energyamount == "bad-request"){
+                return res.status(400).json({ message: "bad-request" })
+            }
 
-    if (energyamount < 5){
-        return res.json({message: "notenoughenergy"})
+            if (!energyamount){
+                return res.json({message: "energynotexist"})
+            }
+
+            if (energyamount < 5){
+                return res.json({message: "notenoughenergy"})
+            }
+        }
     }
+    else{
+        const energyamount = await getenergy(id)
+
+        if (energyamount == "bad-request"){
+            return res.status(400).json({ message: "bad-request" })
+        }
+
+        if (!energyamount){
+            return res.json({message: "energynotexist"})
+        }
+
+        if (energyamount < 5){
+            return res.json({message: "notenoughenergy"})
+        }
+    }
+    
 
     const palosebodata = await Palosebo.findOne({owner: new mongoose.Types.ObjectId(id)})
     .then(data => data)
@@ -686,18 +708,39 @@ exports.startsupermonmon = async (req, res) => {
         return res.json({message: "restricted"})
     }
 
-    const energyamount = await getenergy(id)
+    const cosmeticequip = await checkcosmeticequip(id)
 
-    if (energyamount == "bad-request"){
-        return res.status(400).json({ message: "bad-request" })
+    if (cosmeticequip){
+        if (cosmeticequip.name != "Energy"){
+            const energyamount = await getenergy(id)
+
+            if (energyamount == "bad-request"){
+                return res.status(400).json({ message: "bad-request" })
+            }
+
+            if (!energyamount){
+                return res.json({message: "energynotexist"})
+            }
+
+            if (energyamount < 5){
+                return res.json({message: "notenoughenergy"})
+            }
+        }
     }
+    else{
+        const energyamount = await getenergy(id)
 
-    if (!energyamount){
-        return res.json({message: "energynotexist"})
-    }
+        if (energyamount == "bad-request"){
+            return res.status(400).json({ message: "bad-request" })
+        }
 
-    if (energyamount < 1){
-        return res.json({message: "notenoughenergy"})
+        if (!energyamount){
+            return res.json({message: "energynotexist"})
+        }
+
+        if (energyamount < 5){
+            return res.json({message: "notenoughenergy"})
+        }
     }
 
     const supermonmondata = await Supermonmon.findOne({owner: new mongoose.Types.ObjectId(id)})
