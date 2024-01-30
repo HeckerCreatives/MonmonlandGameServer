@@ -497,16 +497,32 @@ exports.startpalosebo = async (req, res) => {
     await Palosebo.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {endttime: DateTimeGameExpirationMinutes(5), starttime: DateTimeServer()})
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
-    await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
-        $set: {
-            amount: {
-                $max: [0, {
-                    $add: ["$amount", -5]
-                }]
-            }
+    if (cosmeticequip){
+        if (cosmeticequip.name != "Energy"){
+            await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
+                $set: {
+                    amount: {
+                        $max: [0, {
+                            $add: ["$amount", -5]
+                        }]
+                    }
+                }
+            }])
+            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
         }
-    }])
-    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    }
+    else{
+        await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
+            $set: {
+                amount: {
+                    $max: [0, {
+                        $add: ["$amount", -5]
+                    }]
+                }
+            }
+        }])
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    }
 
     const participation = await addpointswalletamount(id, "fiestaparticipation", 1)
 
@@ -784,16 +800,32 @@ exports.startsupermonmon = async (req, res) => {
     await Supermonmon.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {starttime: DateTimeServer()})
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
-    await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
-        $set: {
-            amount: {
-                $max: [0, {
-                    $add: ["$amount", -5]
-                }]
-            }
+    if (cosmeticequip){
+        if (cosmeticequip.name != "Energy"){
+            await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
+                $set: {
+                    amount: {
+                        $max: [0, {
+                            $add: ["$amount", -5]
+                        }]
+                    }
+                }
+            }])
+            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
         }
-    }])
-    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    }
+    else{
+        await Energy.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [{
+            $set: {
+                amount: {
+                    $max: [0, {
+                        $add: ["$amount", -5]
+                    }]
+                }
+            }
+        }])
+        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    }
     
     const participation = await addpointswalletamount(id, "fiestaparticipation", 1)
 
