@@ -1,5 +1,6 @@
 const Communityactivity = require("../modelweb/Communityactivity")
 const Ads = require("../modelweb/Ads")
+const Gameactivity = require("../modelweb/Gameactivity")
 const Investorfunds = require("../modelweb/Investorfunds")
 const Monmoncoin = require("../modelweb/Monmoncoin")
 const Gameactivity = require("../modelweb/Gameactivity")
@@ -185,7 +186,7 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
     .catch(() => "bad-request")
 
     const gameact = await Gameactivity.findOne()
-    .then(data => data.total)
+    .then(data => data.initial)
     .catch(() => "bad-request")
 
     const comact = await Communityactivity.find({$or: [
@@ -210,6 +211,8 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
     .then(data => data.amount)
     .catch(() => "bad-request")
 
+    const comactgem = await Communit
+
     let maxamount = 0
     let maxmgamount = 0
 
@@ -226,8 +229,9 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
 
     maxamount += ads
     maxamount += investor
-    maxamount += gameact
     maxamount *= 1000
+    
+    maxmgamount += gameact
 
     const remainingSpace = maxamount - monmoncoins;
     const remainingmgSpace = maxmgamount - mongem;
