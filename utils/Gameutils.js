@@ -211,8 +211,6 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
     .then(data => data.amount)
     .catch(() => "bad-request")
 
-    const comactgem = await Communit
-
     let maxamount = 0
     let maxmgamount = 0
 
@@ -230,7 +228,7 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
     maxamount += ads
     maxamount += investor
     maxamount *= 1000
-    
+
     maxmgamount += gameact
 
     const remainingSpace = maxamount - monmoncoins;
