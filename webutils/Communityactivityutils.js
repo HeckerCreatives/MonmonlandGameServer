@@ -13,7 +13,7 @@ exports.computecomplan = async (amount) => {
     const diamondpools = (amount * 0.01)
     const incentives = (amount * 0.03)
     const marketing = (amount * 0.02)
-    const tradepayin = (amount * 0.02)
+    const investorfunds = (amount * 0.02)
     const officers = (amount * 0.08)
     const devsshare = (amount * 0.05)
     const companyshare = (amount * 0.02)
@@ -75,8 +75,8 @@ exports.computecomplan = async (amount) => {
         },
         {
             updateOne: {
-                filter: { _id: new mongoose.Types.ObjectId(process.env.tradepayin)},
-                update: { $inc: { amount: tradepayin }}
+                filter: { _id: new mongoose.Types.ObjectId(process.env.investorfundsca)},
+                update: { $inc: { amount: investorfunds }}
             }
         },
         {
@@ -114,7 +114,7 @@ exports.computemerchcomplan = async (amount, itemtype) => {
     const diamondpools = (amount * 0.02)
     const incentives = (amount * 0.02)
     const marketing = (amount * 0.01)
-    const tradepayin = (amount * 0.0)
+    const investorfunds = (amount * 0.0)
     const officers = (amount * 0.05)
     const devsshare = (amount * 0.05)
     const companyshare = (amount * 0.02)
@@ -176,8 +176,8 @@ exports.computemerchcomplan = async (amount, itemtype) => {
         },
         {
             updateOne: {
-                filter: { _id: new mongoose.Types.ObjectId(process.env.tradepayin)},
-                update: { $inc: { amount: tradepayin }}
+                filter: { _id: new mongoose.Types.ObjectId(process.env.investorfundsca)},
+                update: { $inc: { amount: investorfunds }}
             }
         },
         {
@@ -215,7 +215,7 @@ exports.computeshopcomplan = async (amount, itemtype) => {
     const diamondpools = (amount * 0.02)
     const incentives = (amount * 0.02)
     const marketing = (amount * 0.01)
-    const tradepayin = (amount * 0.0)
+    const investorfunds = (amount * 0.0)
     const officers = (amount * 0.05)
     const devsshare = (amount * 0.05)
     const companyshare = (amount * 0.02)
@@ -277,8 +277,8 @@ exports.computeshopcomplan = async (amount, itemtype) => {
         },
         {
             updateOne: {
-                filter: { _id: new mongoose.Types.ObjectId(process.env.tradepayin)},
-                update: { $inc: { amount: tradepayin }}
+                filter: { _id: new mongoose.Types.ObjectId(process.env.investorfundsca)},
+                update: { $inc: { amount: investorfunds }}
             }
         },
         {

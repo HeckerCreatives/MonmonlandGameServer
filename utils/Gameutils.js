@@ -184,8 +184,12 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
     .then(data => data.amount)
     .catch(() => "bad-request")
 
-    const gameact = await Gameactivity.findOne()
+    const gameactmg = await Gameactivity.findOne()
     .then(data => data.initial)
+    .catch(() => "bad-request")
+
+    const gameactmc = await Gameactivity.findOne()
+    .then(data => data.total)
     .catch(() => "bad-request")
 
     const comact = await Communityactivity.find({$or: [
@@ -197,6 +201,9 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
         },
         {
             type: "monstergem"
+        },
+        {
+            type: "investorfunds"
         }
     ]})
     .then(data => data)
@@ -216,7 +223,7 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
     comact.forEach(comactdata => {
         const { amount } = comactdata
 
-        if (comactdata.type == "grinding" || comactdata.type == "quest"){
+        if (comactdata.type == "grinding" || comactdata.type == "quest" || comactdata.type == "investorfunds"){
             maxamount += amount
         }
         else if (comactdata.type == "monstergem"){
@@ -226,9 +233,10 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
 
     maxamount += ads
     maxamount += investor
+    maxamount += gameactmc
     maxamount *= 1000
 
-    maxmgamount += gameact
+    maxmgamount += gameactmg
 
     const remainingSpace = maxamount - monmoncoins;
     const remainingmgSpace = maxmgamount - mongem;

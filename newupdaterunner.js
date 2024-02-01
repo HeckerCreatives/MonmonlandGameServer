@@ -1,3 +1,8 @@
 const { Tasksdataupdate, TaskGameUnlockUpdate, AddMissingTaskToUser, addsupermonmonuserdata, addpalosebodata, recomputemg,dailylimtads } = require("./dataupdate/Newdataupdate")
 
-dailylimtads()
+async function datadd() {
+    // await addsupermonmonuserdata()
+    await dailylimtads()
+}
+
+datadd()
