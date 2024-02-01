@@ -670,3 +670,85 @@ exports.dailylimtads = async() => {
 
     console.log("done creating limit ads")
 }
+
+exports.resetgrindingwithmaxenergy = async() => {
+    try{
+        const client = await connecttodatabase();
+        const database = client.db()
+
+        const ingamegames = database.collection("ingamegames")
+        const pooldetails = database.collection("pooldetails")
+        const energy = database.collection("energy")
+        const gamewallets = database.collection("gamewallets")
+
+        const pooldeetslist = pooldetails.find();
+        const pooldeetsdata = await pooldeetslist.toArray()
+
+        const energyBulkWrite = []
+
+        pooldeetsdata.forEach(data => {
+            let finalmaxenergy = 0;
+
+            switch(data.subscription){
+                case "Pearl":
+                    finalmaxenergy = 20
+                    break;
+                case "Ruby":
+                    finalmaxenergy = 80
+                    break;
+                case "Emerald":
+                    finalmaxenergy = 130
+                    break;
+                case "Diamond":
+                    finalmaxenergy = 180
+                    break;
+                default:
+                    finalmaxenergy = 0
+                    break;
+            }
+
+            energyBulkWrite.push({
+                updateOne: {
+                    filter: {owner: new mongoose.Types.ObjectId(data.owner)},
+                    update: { $set: { amount: finalmaxenergy } }
+                }
+            })
+        })
+
+        await energy.bulkWrite(energyBulkWrite)
+
+        await gamewallets.updateMany(
+            { wallettype: "monstercoin" },
+            {
+                $set: {
+                    amount: 0
+                }
+            }
+        )
+        await gamewallets.updateMany(
+            { wallettype: "monstergemfarm" },
+            {
+                $set: {
+                    amount: 0
+                }
+            }
+        )
+        await ingamegames.updateMany(
+            {},
+            { $set: 
+                {
+                    status: "pending",
+                    unixtime: 0,
+                    harvestmc: 0,
+                    harvestmg: 0,
+                    harvestap: 0,
+                    timestarted: 0
+                }
+            }
+        )
+    }
+    catch(ex){
+        console.log(ex)
+        await closedatabase();
+    }
+}
