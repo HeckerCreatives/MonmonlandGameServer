@@ -562,6 +562,10 @@ exports.endpalosebo = async (req, res) => {
         return res.json({message: "gamenotstarted"})
     }
 
+    const scorechecker = getfarm(palosebodata.starttime, palosebodata.endttime, 300)
+
+    const finalscorechecker = 305 - scorechecker
+
     if (score > 300){
         return res.json({message: "cheater", expectedscore: finalscorechecker, scoresend: score})
     }
