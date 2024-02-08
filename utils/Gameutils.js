@@ -201,9 +201,6 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
         },
         {
             type: "monstergem"
-        },
-        {
-            type: "investorfunds"
         }
     ]})
     .then(data => data)
@@ -223,7 +220,7 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
     comact.forEach(comactdata => {
         const { amount } = comactdata
 
-        if (comactdata.type == "grinding" || comactdata.type == "quest" || comactdata.type == "investorfunds"){
+        if (comactdata.type == "grinding" || comactdata.type == "quest"){
             maxamount += amount
         }
         else if (comactdata.type == "monstergem"){
