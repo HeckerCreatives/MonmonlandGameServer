@@ -277,7 +277,7 @@ exports.addtototalfarmmc = async (mcfarm, mgfarm) => {
         }
     }])
     .then(() => {
-        return {message: "success", mctobeadded: mctobeadded.toFixed(2), mgtobeadded: mgtobeadded.toFixed(2)}
+        return {message: "success", mctobeadded: mctobeadded.toFixed(5), mgtobeadded: mgtobeadded.toFixed(5)}
     })
     .catch(() => {
         return {message: "bad-request", }
