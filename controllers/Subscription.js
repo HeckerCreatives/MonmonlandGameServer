@@ -89,11 +89,11 @@ exports.buysubscription = async (req, res) => {
         ])
         .then(async () => {
 
-            // const complan = await computecomplan(finalsubsamount)
+            const complan = await computecomplan(finalsubsamount)
 
-            // if (complan != "success"){
-            //     return res.status(400).json({ message: "bad-request" })
-            // }
+            if (complan != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
 
             // const walletamount = await getwalletamount(id, "monstercoin")
 
