@@ -5,6 +5,9 @@ exports.getsubsamount = (substype) => {
     let subsamount = 0;
 
     switch(substype){
+        case "Pearlplus":
+            subsamount = 10
+            break;
         case "Ruby":
             subsamount = 20
             break;

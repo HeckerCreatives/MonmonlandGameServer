@@ -979,6 +979,8 @@ exports.supermonmonleaderboard = async (req, res) => {
 }
 
 exports.playsponsor = async (req, res) => {
+    const { id } = req.user;
+
     const maintenance = await checkmaintenance("maintenancesponsor")
 
     if (maintenance == "1") {
