@@ -89,7 +89,10 @@ exports.buysubscription = async (req, res) => {
         ])
         .then(async () => {
 
+            console.log(finalsubsamount);
+            console.log("nag error dito 1");
             const complan = await computecomplan(finalsubsamount)
+            console.log("nag error dito");
 
             if (complan != "success"){
                 return res.status(400).json({ message: "bad-request" })
