@@ -76,7 +76,7 @@ exports.computecomplan = async (amount) => {
         {
             updateOne: {
                 filter: { _id: new mongoose.Types.ObjectId(process.env.investorfundsca)},
-                update: { $inc: { amount: investorfundsca }}
+                update: { $inc: { amount: investorfunds }}
             }
         },
         {
