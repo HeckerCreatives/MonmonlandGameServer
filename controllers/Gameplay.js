@@ -1215,6 +1215,11 @@ exports.startsponsor = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
 
+    const participation = await addpointswalletamount(id, "sponsoraparticipation", 1)
+
+    if (participation != "success"){
+        return res.json({message: "bad-request"})
+    }
 
     let finaldata = {
         itemnumber: chosenprice.itemnumber,
