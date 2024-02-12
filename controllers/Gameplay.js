@@ -1204,6 +1204,18 @@ exports.startsponsor = async (req, res) => {
         }
     }
 
+    const apadd = await addpointswalletamount(id, "activitypoints", 10)
+    const addlbpoints = await setleaderboard(id, 10)
+
+    if (apadd != "success"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+    if (addlbpoints != "success"){
+        return res.status(400).json({ message: "bad-request" })
+    }
+
+
     let finaldata = {
         itemnumber: chosenprice.itemnumber,
         itemname: chosenprice.itemname
