@@ -117,9 +117,9 @@ exports.buysubscription = async (req, res) => {
 
                 return res.json({message: "success"})
             })
-            .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+            .catch(err => res.status(400).json({ message: "bad-request whaat", data: err.message }))
         })
-        .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+        .catch(err => res.status(400).json({ message: "bad-request shiiit", data: err.message }))
     }
     else{
         await addwalletamount(id, "balance", finalsubsamount)
