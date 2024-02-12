@@ -73,18 +73,18 @@ exports.computecomplan = async (amount) => {
                 update: { $inc: { amount: monstergem }}
             }
         },
-        // {
-        //     updateOne: {
-        //         filter: { _id: new mongoose.Types.ObjectId(process.env.investorfundsca)},
-        //         update: { $inc: { amount: investorfunds }}
-        //     }
-        // },
-        // {
-        //     updateOne: {
-        //         filter: { _id: new mongoose.Types.ObjectId(process.env.complanpayin)},
-        //         update: { $inc: { amount: complan }}
-        //     }
-        // }
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.investorfundsca)},
+                update: { $inc: { amount: investorfundsca }}
+            }
+        },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.complanpayin)},
+                update: { $inc: { amount: complan }}
+            }
+        }
     ]
 
     await Communityactivity.bulkWrite(bulkOperations)
