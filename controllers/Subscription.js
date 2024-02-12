@@ -91,12 +91,12 @@ exports.buysubscription = async (req, res) => {
 
             console.log(finalsubsamount);
             console.log("nag error dito 1");
-            // const complan = await computecomplan(finalsubsamount)
-            // console.log("nag error dito");
+            const complan = await computecomplan(finalsubsamount)
+            console.log("nag error dito");
 
-            // if (complan != "success"){
-            //     return res.status(400).json({ message: "bad-request" })
-            // }
+            if (complan != "success"){
+                return res.status(400).json({ message: "bad-request" })
+            }
 
             const walletamount = await getwalletamount(id, "monstercoin")
 
