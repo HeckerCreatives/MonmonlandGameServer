@@ -43,36 +43,36 @@ exports.computecomplan = async (amount) => {
                 update: { $inc: { amount: devsshare }}
             }
         },
-        // {
-        //     updateOne: {
-        //         filter: { _id: new mongoose.Types.ObjectId(process.env.companyshareca)},
-        //         update: { $inc: { amount: companyshare }}
-        //     }
-        // },
-        // {
-        //     updateOne: {
-        //         filter: { _id: new mongoose.Types.ObjectId(process.env.officersca)},
-        //         update: { $inc: { amount: officers }}
-        //     }
-        // },
-        // {
-        //     updateOne: {
-        //         filter: { _id: new mongoose.Types.ObjectId(process.env.marketingca)},
-        //         update: { $inc: { amount: marketing }}
-        //     }
-        // },
-        // {
-        //     updateOne: {
-        //         filter: { _id: new mongoose.Types.ObjectId(process.env.incentivesca)},
-        //         update: { $inc: { amount: incentives }}
-        //     }
-        // },
-        // {
-        //     updateOne: {
-        //         filter: { _id: new mongoose.Types.ObjectId(process.env.monstergemca)},
-        //         update: { $inc: { amount: monstergem }}
-        //     }
-        // },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.companyshareca)},
+                update: { $inc: { amount: companyshare }}
+            }
+        },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.officersca)},
+                update: { $inc: { amount: officers }}
+            }
+        },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.marketingca)},
+                update: { $inc: { amount: marketing }}
+            }
+        },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.incentivesca)},
+                update: { $inc: { amount: incentives }}
+            }
+        },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.monstergemca)},
+                update: { $inc: { amount: monstergem }}
+            }
+        },
         // {
         //     updateOne: {
         //         filter: { _id: new mongoose.Types.ObjectId(process.env.investorfundsca)},
