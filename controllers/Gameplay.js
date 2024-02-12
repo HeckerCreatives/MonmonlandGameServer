@@ -1,6 +1,7 @@
 const Ingamegames = require("../models/Games")
 const Playtimegrinding = require("../models/Playtimegrinding")
 const Energy = require("../models/Energy")
+const { checkenergyinventoryconsumable } = require("../utils/Energyutils")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
 const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue, prizepooladd, fiestarewards, getenergy, energygrindconsumption } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
@@ -1130,21 +1131,20 @@ exports.startsponsor = async (req, res) => {
 
     if (chosenprice.itemtype == "cosmetics"){
 
-        const isexist = await Cosmetics.findOne({name: chosenprice.itemid})
+        const isexist = await Cosmetics.findOne({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid})
         .then(data => data)
-
         if (isexist){
             if (chosenprice.itemid == "Energy"){
                 const time = AddUnixtimeDay(isexist.expiration, chosenprice.expiration)
-
-                await Cosmetics.findOne({name: chosenprice.itemid, type: "ring"}, {expiration: time})
+                console.log(time)
+                await Cosmetics.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid, type: "ring"}, {expiration: time})
                 .catch(err => {
                     return res.status(400).json({ message: "bad-request", data: err.message })
                 })
             }
         }
         else{
-            await Cosmetics.create({name: chosenprice.itemid, type: "ring", expiration: DateTimeServerExpiration(chosenprice.expiration)})
+            await Cosmetics.create({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid, type: "ring", expiration: DateTimeServerExpiration(chosenprice.expiration), permanent: "nonpermanent", isequip: 0})
             .catch(err => {
                 return res.status(400).json({ message: "bad-request", data: err.message })
             })
@@ -1215,7 +1215,7 @@ exports.startsponsor = async (req, res) => {
         return res.status(400).json({ message: "bad-request" })
     }
 
-    const participation = await addpointswalletamount(id, "sponsoraparticipation", 1)
+    const participation = await addpointswalletamount(id, "sponsorparticipation", 1)
 
     if (participation != "success"){
         return res.json({message: "bad-request"})
