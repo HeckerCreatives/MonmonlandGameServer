@@ -37,12 +37,12 @@ exports.computecomplan = async (amount) => {
                 update: { $inc: { amount: diamondpools }}
             }
         },
-        // {
-        //     updateOne: {
-        //         filter: { _id: new mongoose.Types.ObjectId(process.env.devsshareca)},
-        //         update: { $inc: { amount: devsshare }}
-        //     }
-        // },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.devsshareca)},
+                update: { $inc: { amount: devsshare }}
+            }
+        },
         // {
         //     updateOne: {
         //         filter: { _id: new mongoose.Types.ObjectId(process.env.companyshareca)},
