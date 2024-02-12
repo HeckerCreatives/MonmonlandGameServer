@@ -18,7 +18,7 @@ exports.buysubscription = async (req, res) => {
         return res.json({message: "maintenance"})
     }
 
-    if (substype != "Ruby" && substype != "Emerald" && substype != "Diamond"){
+    if (substype != "Pearlplus" && substype != "Ruby" && substype != "Emerald" && substype != "Diamond"){
         return res.json({message: "subsnotexist"})
     }
 
