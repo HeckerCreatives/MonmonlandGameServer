@@ -70,6 +70,7 @@ exports.buysubscription = async (req, res) => {
     }
 
     if (sendcoms == "success"){
+        console.log(id, substype, new mongoose.Types.ObjectId(id));
         await Pooldetails.updateOne({owner: new mongoose.Types.ObjectId(id)}, [
             {
                 $set: {
