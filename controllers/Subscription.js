@@ -70,8 +70,7 @@ exports.buysubscription = async (req, res) => {
     }
 
     if (sendcoms == "success"){
-        console.log(id, substype, new mongoose.Types.ObjectId(id));
-        await Pooldetails.findOneAndUpdate({owner: "659e4baa88dfd14856dac02d"}, [
+        await Pooldetails.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, [
             {
                 $set: {
                     subscription: substype,
@@ -90,35 +89,35 @@ exports.buysubscription = async (req, res) => {
         ])
         .then(async () => {
 
-            const complan = await computecomplan(finalsubsamount)
+            // const complan = await computecomplan(finalsubsamount)
 
-            if (complan != "success"){
-                return res.status(400).json({ message: "bad-request" })
-            }
+            // if (complan != "success"){
+            //     return res.status(400).json({ message: "bad-request" })
+            // }
 
-            const walletamount = await getwalletamount(id, "monstercoin")
+            // const walletamount = await getwalletamount(id, "monstercoin")
 
-            if (!walletamount){
-                return res.json({message: "nowallet"})
-            }
+            // if (!walletamount){
+            //     return res.json({message: "nowallet"})
+            // }
 
-            const addtotalmc = await addtototalfarmmc(walletamount.amount, 0)
+            // const addtotalmc = await addtototalfarmmc(walletamount.amount, 0)
 
-            if (addtotalmc.message != "success"){
-                return res.json({message: "failed"})
-            }
+            // if (addtotalmc.message != "success"){
+            //     return res.json({message: "failed"})
+            // }
 
-            await SubsAccumulated.findOneAndUpdate({subsname: substype.toLowerCase()}, {$inc: {amount: finalsubsamount}})
-            .then(async () => {
-                const analyticsadd = await addanalytics(id, `Buy Subscription (${substype})`, finalsubsamount)
+            // await SubsAccumulated.findOneAndUpdate({subsname: substype.toLowerCase()}, {$inc: {amount: finalsubsamount}})
+            // .then(async () => {
+            //     const analyticsadd = await addanalytics(id, `Buy Subscription (${substype})`, finalsubsamount)
 
-                if (analyticsadd == "bad-request"){
-                    return res.status(400).json({ message: "bad-requestasdfasd" })
-                }
+            //     if (analyticsadd == "bad-request"){
+            //         return res.status(400).json({ message: "bad-requestasdfasd" })
+            //     }
 
-                return res.json({message: "success"})
-            })
-            .catch(err => res.status(400).json({ message: "bad-request whaat", data: err.message }))
+            //     return res.json({message: "success"})
+            // })
+            // .catch(err => res.status(400).json({ message: "bad-request whaat", data: err.message }))
         })
         .catch(err => res.status(400).json({ message: "bad-request shiiit", data: err.message }))
     }
