@@ -175,7 +175,7 @@ exports.claimtask = async(req, res) => {
         }
     }
     else if (tasktype == "3"){
-        if (pooldetails.subscription != "Ruby" && pooldetails.subscription != "Emerald" && pooldetails.subscription != "Diamond"){
+        if (pooldetails.subscription != "Pearlplus" && pooldetails.subscription != "Ruby" && pooldetails.subscription != "Emerald" && pooldetails.subscription != "Diamond"){
             return res.json({message: "requirementsnotmet"})
         }
 
