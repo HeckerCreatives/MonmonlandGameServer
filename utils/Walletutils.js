@@ -4,6 +4,7 @@ const Gameusers = require("../models/Gameusers")
 const Walletscutoff = require("../models/Walletscutoff")
 const Wallethistory = require("../models/Wallethistory")
 const Ingameleaderboard = require("../models/Leaderboard")
+const Communityactivity = require("../modelweb/Communityactivity")
 const { setleaderboard } = require("../utils/Leaderboards")
 
 exports.checkwalletamount = async (amount, id) => {

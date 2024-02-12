@@ -110,6 +110,8 @@ exports.playgame = async (req, res) => {
     let finalmg = (((mgtool + mgclock + energyringmg) / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription);
     let monstercoin = mcmined(toolsequip, clocksequip?.type == null ? 0 : clocksequip.type)
 
+    console.log(finalmg, "this is the raw mg")
+
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type))
     
     //  Check energy

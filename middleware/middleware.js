@@ -4,6 +4,8 @@ const path = require("path");
 const publicKey = fs.readFileSync(path.resolve(__dirname, "../keygen/public-key.pem"), 'utf-8');
 const jsonwebtokenPromisified = require('jsonwebtoken-promisified');
 const { checkmaintenance } = require("../utils/Maintenance")
+const { getpooldetails } = require("../utils/Pooldetailsutils")
+const { DateTimeExpiration, DateTimeServer } = require("../utils/Datetimetools")
 
 
 const verifyJWT = async (token) => {
@@ -45,6 +47,32 @@ exports.protectplayer = async (req, res, next) => {
         .select("-password")
         .then(data => data)
         .catch(err => res.status(401).json({ message: 'Unauthorized' }))
+
+        //  CHECK IF DATE REGISTRATION > DATE REGISTRATION + 3 DAYS
+        //  IF TRUE RETURN MESSAGE INACTIVE
+        //  ONLY FOR PEARL
+        const pooldeets = await getpooldetails(decodedToken.id)
+
+        if (pooldeets == "erroraccount"){
+            return res.status(401).json({ message: 'erroraccount' })
+        }
+
+        if (pooldeets == "bad-request"){
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        if (pooldeets.subscription == "Pearl"){
+            const expirationunixtime = DateTimeExpiration(userdata.createdAt, 3)
+            if (DateTimeServer() > expirationunixtime){
+
+                if (userdata.status == "active"){
+                    await Gameusers.findOneAndUpdate({_id: decodedToken.id}, {status: "expired"})
+                    .catch(err => res.status(401).json({ message: 'Unauthorized' }))
+                }
+
+                return res.status(401).json({message: "pearlinactive"})
+            }
+        }
 
         if (decodedToken.token != userdata.token){
             return res.status(401).json({ message: 'duallogin' })

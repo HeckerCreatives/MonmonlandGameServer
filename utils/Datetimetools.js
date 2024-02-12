@@ -25,6 +25,33 @@ exports.DateTimeServerExpiration = (expiration) => {
     return unixTimeSecondsIn30Days;
 }
 
+exports.DateTimeExpiration = (starttime, expiration) => {
+    const date = new Date(starttime);
+
+    // Get the Unix timestamp in milliseconds
+    const unixTimeMilliseconds = date.getTime();
+
+    // Convert it to Unix timestamp in seconds
+    const unixTimeSeconds = Math.floor(unixTimeMilliseconds / 1000);
+
+    // Add 30 days (30 * 24 * 60 * 60 seconds) to the current timestamp
+    const unixTimeSecondsIn30Days = unixTimeSeconds + (expiration * 24 * 60 * 60);
+
+    return unixTimeSecondsIn30Days;
+}
+
+exports.DateTimeToUnixtime = (time) => {
+    const date = new Date(time);
+
+    // Get the Unix timestamp in milliseconds
+    const unixTimeMilliseconds = date.getTime();
+
+    // Convert it to Unix timestamp in seconds
+    const unixTimeSeconds = Math.floor(unixTimeMilliseconds / 1000);
+
+    return unixTimeSeconds;
+} 
+
 exports.DateTimeGameExpiration = (expiration) => {
     const date = new Date();
 

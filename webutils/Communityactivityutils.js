@@ -106,6 +106,15 @@ exports.computemerchcomplan = async (amount, itemtype) => {
         response = "bad-request"
         return
     })
+
+    let complanmerchid = ""
+
+    if (itemtype == "clock"){
+        complanmerchid = process.env.complanmerchandise
+    }
+    else if (itemtype == "tools"){
+        complanmerchid = process.env.complantools
+    }
                 
     const complan = (amount * 0.30)
     const leaderboards = (amount * 0.03)
@@ -182,7 +191,7 @@ exports.computemerchcomplan = async (amount, itemtype) => {
         },
         {
             updateOne: {
-                filter: { _id: new mongoose.Types.ObjectId(process.env.complanpayin)},
+                filter: { _id: new mongoose.Types.ObjectId(complanmerchid)},
                 update: { $inc: { amount: complan }}
             }
         }
@@ -283,7 +292,7 @@ exports.computeshopcomplan = async (amount, itemtype) => {
         },
         {
             updateOne: {
-                filter: { _id: new mongoose.Types.ObjectId(process.env.complanpayin)},
+                filter: { _id: new mongoose.Types.ObjectId(process.env.complancosmetics)},
                 update: { $inc: { amount: complan }}
             }
         }

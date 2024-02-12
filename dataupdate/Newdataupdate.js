@@ -601,7 +601,7 @@ exports.dailylimtads = async() => {
                     {
                         "dailylimit": {
                             $not: {
-                                $elemMatch: { wallettype: "watchads" }
+                                $elemMatch: { wallettype: "1watchads" }
                             }
                         }
                     }
@@ -752,3 +752,4 @@ exports.resetgrindingwithmaxenergy = async() => {
         await closedatabase();
     }
 }
+
