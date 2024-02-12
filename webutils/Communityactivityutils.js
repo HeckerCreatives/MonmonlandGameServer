@@ -88,8 +88,9 @@ exports.computecomplan = async (amount) => {
     ]
 
     await Communityactivity.bulkWrite(bulkOperations)
-    .catch(() => {
+    .catch(err => {
         response = "bad-request"
+        console.log(err.message)
         return
     })
 
