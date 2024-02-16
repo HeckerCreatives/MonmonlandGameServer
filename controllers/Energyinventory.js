@@ -65,6 +65,9 @@ exports.useenergyinventory = async (req, res) => {
         case "Pearl":
             finalmaxenergy = 20
             break;
+        case "Pearlplus":
+            finalmaxenergy = 20
+            break;
         case "Ruby":
             finalmaxenergy = 80
             break;

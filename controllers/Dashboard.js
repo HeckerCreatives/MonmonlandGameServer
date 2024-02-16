@@ -68,7 +68,6 @@ exports.dashboardplayer = async (req, res) => {
 
     const grinding = communityactivity.filter(e => e.type == "grinding")
     const quest = communityactivity.filter(e => e.type == "quest")
-    const investorfunds = communityactivity.filter(e => e.type == "investorfunds")
 
     const mclimit = grinding[0].amount + quest[0].amount + gameactivity.total + ads.amount + investors.amount
     
