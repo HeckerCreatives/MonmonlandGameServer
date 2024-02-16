@@ -71,6 +71,7 @@ exports.energyringmgvalue = (cosmetics) => {
 exports.getnumbergamespersubs = (substype) => {
     const number = {
         Pearl: 1,
+        Pearlplus: 1,
         Ruby: 3,
         Emerald: 5,
         Diamond: 7
@@ -82,6 +83,7 @@ exports.getnumbergamespersubs = (substype) => {
 exports.checkmgclock = (clocktype, substype) => {
     const pricingInfo = {
         Pearl: 0,
+        Pearlplus: 0,
         Ruby: {
           1: 0.70,
           2: 1.20,
