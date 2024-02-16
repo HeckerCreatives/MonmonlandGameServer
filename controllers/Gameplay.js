@@ -22,6 +22,7 @@ const Gamewallet = require("../models/Wallets")
 const Sponsorlist = require("../models/Sponsorlist")
 const Cosmetics = require("../models/Cosmetics")
 const GrindingHistory = require("../models/Grindinghistory")
+const Sponsor = require("../models/Sponsor")
 
 exports.playgame = async (req, res) => {
     const { id } = req.user
@@ -1113,9 +1114,12 @@ exports.startsponsor = async (req, res) => {
     let cumulativeChance = 0;
     let chosenprice;
 
+
     for (const { percentage } of finalprizelist){
         cumulativeChance += percentage;
 
+        console.log(percentage)
+        console.log(randomNumber <= cumulativeChance)
         if (randomNumber <= cumulativeChance){
             chosenprice = finalprizelist[prizeindex]
 
@@ -1124,6 +1128,10 @@ exports.startsponsor = async (req, res) => {
 
         prizeindex++;
     }
+    
+    console.log(finalprizelist.length)
+    console.log(chosenprice)
+    console.log(cumulativeChance, randomNumber)
 
     if (chosenprice == null){
         return res.json({message: "noprize"})
@@ -1139,14 +1147,14 @@ exports.startsponsor = async (req, res) => {
                 console.log(time)
                 await Cosmetics.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid, type: "ring"}, {expiration: time})
                 .catch(err => {
-                    return res.status(400).json({ message: "bad-request", data: err.message })
+                    return res.status(400).json({ message: "bad-request 1", data: err.message })
                 })
             }
         }
         else{
             await Cosmetics.create({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid, type: "ring", expiration: DateTimeServerExpiration(chosenprice.expiration), permanent: "nonpermanent", isequip: 0})
             .catch(err => {
-                return res.status(400).json({ message: "bad-request", data: err.message })
+                return res.status(400).json({ message: "bad-request 2", data: err.message })
             })
         }
     }
@@ -1165,7 +1173,7 @@ exports.startsponsor = async (req, res) => {
             if (!dataenergy){
                 await EnergyInventory.create({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid, type: "energy", amount: chosenprice.qty, consumableamount: checkenergyinventoryconsumable(`${chosenprice.itemid}${"energy"}`)})
                 .catch(err => {
-                    return res.status(400).json({ message: "bad-request", data: err.message })
+                    return res.status(400).json({ message: "bad-request 3", data: err.message })
                 })
 
                 return
@@ -1173,11 +1181,11 @@ exports.startsponsor = async (req, res) => {
 
             await EnergyInventory.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), name: chosenprice.itemid, type: "energy"}, {$inc: { amount: chosenprice.qty }})
             .catch(err => {
-                return res.status(400).json({ message: "bad-request", data: err.message })
+                return res.status(400).json({ message: "bad-request 4", data: err.message })
             })
         })
         .catch(err => {
-            return res.status(400).json({ message: "bad-request", data: err.message })
+            return res.status(400).json({ message: "bad-request 5", data: err.message })
         })
     }
 
@@ -1193,13 +1201,13 @@ exports.startsponsor = async (req, res) => {
         const buttons = await Gameunlock.findOne({type: chosenprice.itemid})
         .then(data => data)
         .catch(err => {
-            return res.status(400).json({ message: "bad-request", data: err.message })
+            return res.status(400).json({ message: "bad-request 6", data: err.message })
         })
 
         if (!buttons){
             await Gameunlock.create({owner: new mongoose.Types.ObjectId(id), type: chosenprice.itemid, value: "1"})
             .catch(err => {
-                return res.status(400).json({ message: "bad-request", data: err.message })
+                return res.status(400).json({ message: "bad-request 7", data: err.message })
             })
         }
     }
@@ -1220,6 +1228,8 @@ exports.startsponsor = async (req, res) => {
     if (participation != "success"){
         return res.json({message: "bad-request"})
     }
+
+    await Sponsor.create({ owner: new mongoose.Types.ObjectId(id), itemwon: chosenprice.itemname })
 
     let finaldata = {
         itemnumber: chosenprice.itemnumber,
