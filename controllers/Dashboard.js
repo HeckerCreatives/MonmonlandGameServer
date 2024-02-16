@@ -70,7 +70,7 @@ exports.dashboardplayer = async (req, res) => {
     const quest = communityactivity.filter(e => e.type == "quest")
     const investorfunds = communityactivity.filter(e => e.type == "investorfunds")
 
-    const mclimit = grinding[0].amount + quest[0].amount + gameactivity.total + ads.amount + investors.amount + investorfunds[0].amount
+    const mclimit = grinding[0].amount + quest[0].amount + gameactivity.total + ads.amount + investors.amount
     
     const mcvalue = mclimit / (totalmcval.amount == 0 ? 1 : totalmcval.amount)
 
