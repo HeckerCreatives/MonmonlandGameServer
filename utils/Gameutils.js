@@ -160,6 +160,7 @@ exports.mcmined = (toolstype, clocktype) => {
 exports.checkgameavailable = (substype, gametype) => {
     const allowedGameTypes = {
         Pearl: ["woodcutting"],
+        Pearlplus: ["woodcutting"],
         Ruby: ["woodcutting", "mining", "fishing"],
         Emerald: ["woodcutting", "mining", "fishing", "farming", "hunting"],
         Diamond: ["woodcutting", "mining", "fishing", "farming", "hunting", "crafting", "smithing"]
