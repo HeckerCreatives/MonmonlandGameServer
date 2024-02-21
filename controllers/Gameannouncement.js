@@ -13,7 +13,7 @@ exports.getgameannouncement = (req, res) => {
             description: data[0].description
         }
         
-        return res.json({message: "success", finaldata})
+        return res.json({message: "success", data: finaldata})
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 }
