@@ -420,12 +420,14 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
             return
         });
 
+
         const unilevelmg = {}
 
         await unilevelresult.forEach(datalevel => {
             unilevelmg[datalevel.level] = {
                 owner: new mongoose.Types.ObjectId(datalevel._id),
-                equipmentData: datalevel.equipmentData
+                equipmentData: datalevel.equipmentData,
+                clockdata: datalevel.clockData
             }
         })
 
@@ -439,9 +441,9 @@ exports.sendmgtounilevel = async(commissionAmount, id, historytype, type, itemty
                 break;
             }
             
-            const ownedtools = await unilevelmg[a].equipmentData.some(tooldata => tooldata.isowned == '1' && tooldata.type != '1');
+            const ownedtools = await unilevelmg[a].equipmentData.length <= 0 ? false : unilevelmg[a].equipmentData.some(tooldata => tooldata.isowned == '1' && tooldata.type != '1');
 
-            const ownedclocks = await unilevelmg[a].clockdata == null ? false : unilevelmg[a].clockData.some(clockdata => clockdata.isowned == '1')
+            const ownedclocks = await unilevelmg[a].clockdata.length <= 0 ? false : unilevelmg[a].clockdata.some(clockdata => clockdata.isowned == '1')
 
             if (unilevelmg[a].owner == process.env.MONMONLAND_ID){
                 
