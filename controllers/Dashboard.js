@@ -9,8 +9,10 @@ const Monmoncoin = require("../modelweb/Monmoncoin")
 const Investorfunds = require("../modelweb/Investorfunds")
 const Wallethistory = require("../models/Wallethistory")
 const Dailylimit = require("../models/Dailylimit")
+const Playerdetails = require("../models/Playerdetails")
 const { default: mongoose } = require("mongoose")
 const { DateTimeServer } = require("../utils/Datetimetools")
+const fs = require("fs")
 
 exports.dashboardplayer = async (req, res) => {
     const { id } = req.user
@@ -132,6 +134,12 @@ exports.dashboardplayer = async (req, res) => {
         data.dailylimit[wallettype] = amount
     })
 
+    const playerdeets = await Playerdetails.findOne({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    data["profilepicture"] = playerdeets.profilepicture;
+
     res.json({message: "success", data: data})
 }
 
@@ -176,4 +184,38 @@ exports.findwalletcutoff = (req, res) => {
         res.json({message: "success", data: finaldata})
     })
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+}
+
+exports.uploadprofilepicture = async (req, res) => {
+    const {id} = req.user
+
+    let profilepicturefile = "";
+
+    if (req.file){
+        profilepicturefile = req.file.path
+    }
+    else{
+        return res.status(400).json({ message: "failed", 
+        data: "Please complete the form before saving the data!" })
+    }
+
+    const playerdeets = await Playerdetails.findOne({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    if (playerdeets.profilepicture != "none"){
+        //  DELETE THE PREVIOUS PROFILE PICTURE
+
+        try{
+            fs.unlinkSync(playerdeets.profilepicture)
+        }
+        catch(ex){
+            console.log(`Failed to delete profile picture ${ex.message}`)
+        }
+    }
+
+    await Playerdetails.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {profilepicture: profilepicturefile})
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    return res.json({message: "success"})
 }

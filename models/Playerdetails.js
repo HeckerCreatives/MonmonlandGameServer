@@ -12,7 +12,13 @@ const PlayerdetailsSchema = new mongoose.Schema(
         email: {
             type: String
         },
-        
+        walletaddress: {
+            type: String
+        },
+        profilepicture: {
+            type: String,
+            default: "none"
+        }
     },
     {
         timestamps: true
