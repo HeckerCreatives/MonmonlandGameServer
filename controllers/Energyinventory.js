@@ -84,6 +84,7 @@ exports.useenergyinventory = async (req, res) => {
 
     finalmaxenergy += checkring
 
+
     EnergyInventory.findOne({owner: new mongoose.Types.ObjectId(id), _id: new mongoose.Types.ObjectId(itemid)})
     .then(async energyinventorydata => {
         if (!energyinventorydata){

@@ -10,6 +10,7 @@ const Investorfunds = require("../modelweb/Investorfunds")
 const Wallethistory = require("../models/Wallethistory")
 const Dailylimit = require("../models/Dailylimit")
 const Playerdetails = require("../models/Playerdetails")
+const Gameunlock = require("../models/Gameunlock")
 const { default: mongoose } = require("mongoose")
 const { DateTimeServer } = require("../utils/Datetimetools")
 const fs = require("fs")
@@ -140,6 +141,20 @@ exports.dashboardplayer = async (req, res) => {
 
     data["profilepicture"] = playerdeets.profilepicture;
 
+    const gameunlock = await Gameunlock.find({owner: new mongoose.Types.ObjectId(id), $or: [{type: "playall"}, {type: "claimall"}]})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    if (gameunlock.length <= 0){
+        data["claimall"] = "0"
+        data["playall"] = "0"
+    }
+    else{
+        gameunlock.forEach(unlockdata => {
+            data[unlockdata.type] = unlockdata.value
+        })
+    }
+
     res.json({message: "success", data: data})
 }
 
@@ -202,7 +217,7 @@ exports.uploadprofilepicture = async (req, res) => {
     const playerdeets = await Playerdetails.findOne({owner: new mongoose.Types.ObjectId(id)})
     .then(data => data)
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
-
+    console.log(playerdeets.profilepicture)
     if (playerdeets.profilepicture != "none"){
         //  DELETE THE PREVIOUS PROFILE PICTURE
 
@@ -215,7 +230,7 @@ exports.uploadprofilepicture = async (req, res) => {
     }
 
     await Playerdetails.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {profilepicture: profilepicturefile})
-    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message + "huehue" }))
 
     return res.json({message: "success"})
 }

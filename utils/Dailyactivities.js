@@ -3,6 +3,9 @@ exports.getavailabledailyactivities = (substype, activitytype) => {
         Pearl: {
             1: "play"
         },
+        Pearlplus: {
+            1: "play"
+        },
         Ruby: {
             1: "play",
             2: "play"

@@ -262,20 +262,6 @@ exports.getgames = async (req, res) => {
         }
     })
 
-    const gameunlock = await Gameunlock.find({owner: new mongoose.Types.ObjectId(id), $or: [{type: "playall"}, {type: "claimall"}]})
-    .then(data => data)
-    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
-
-    if (gameunlock.length <= 0){
-        data["claimall"] = "0"
-        data["playall"] = "0"
-    }
-    else{
-        gameunlock.forEach(unlockdata => {
-            data[unlockdata.type] = unlockdata.value
-        })
-    }
-
     return res.json({message: "success", data: data})
 }
 

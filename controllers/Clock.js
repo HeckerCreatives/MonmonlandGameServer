@@ -72,7 +72,7 @@ exports.equipclock = async (req, res) => {
     await Clock.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), _id: new mongoose.Types.ObjectId(clockid)}, {isequip: 1})
     .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
 
-    res.json({message: "success"})
+    return res.json({message: "success"})
 }
 
 exports.buyclocks = async (req, res) => {
