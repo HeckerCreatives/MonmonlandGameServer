@@ -14,7 +14,7 @@ exports.getenergyinventory = (req, res) => {
     EnergyInventory.find({owner: new mongoose.Types.ObjectId(id)})
     .then(data => {
         if (data.length <= 0){
-            return res.json({message: "noitems"})
+            return res.json({message: "success"})
         }
         
         let finaldata = {}
