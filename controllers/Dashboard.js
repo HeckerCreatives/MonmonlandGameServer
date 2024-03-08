@@ -11,6 +11,8 @@ const Wallethistory = require("../models/Wallethistory")
 const Dailylimit = require("../models/Dailylimit")
 const Playerdetails = require("../models/Playerdetails")
 const Gameunlock = require("../models/Gameunlock")
+const Gameusers = require("../models/Gameusers")
+const Token = require("../modelweb/Token")
 const { default: mongoose } = require("mongoose")
 const { DateTimeServer } = require("../utils/Datetimetools")
 const fs = require("fs")
@@ -154,6 +156,21 @@ exports.dashboardplayer = async (req, res) => {
             data[unlockdata.type] = unlockdata.value
         })
     }
+
+    const gameplayer = await Gameusers.findOne({_id: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+
+    data["playstatus"] = gameplayer.playstatus
+
+    const tokens = await Token.find({owner: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
+    
+    tokens.forEach(tokendata => {
+        const { type, amount } = tokendata;
+        data.wallets[type] = amount;
+    });
 
     res.json({message: "success", data: data})
 }

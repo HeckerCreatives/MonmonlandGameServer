@@ -28,6 +28,10 @@ const GameusersSchema = new mongoose.Schema(
         },
         banreason: {
             type: String
+        },
+        playstatus: {
+            type: String,
+            default: "active"
         }
     },
     {

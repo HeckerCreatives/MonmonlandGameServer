@@ -69,7 +69,7 @@ exports.authlogin = async (req, res) => {
 
                 const token = await encrypt(privateKey)
 
-                Gameusers.findByIdAndUpdate({_id: user._id}, {$set: { token: token}}, { new: true })
+                Gameusers.findByIdAndUpdate({_id: user._id}, {$set: {token: token}}, { new: true })
                 .select("-password")
                 .then(async () => {
                     const payload = { id: user._id, username: user.username, status: user.status, token: token }
