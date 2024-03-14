@@ -118,11 +118,7 @@ exports.claimtask = async(req, res) => {
         if (pooldetails.subscription != "Pearl"){
             const addtofarm = 200
 
-            if (addtofarm.message != "success"){
-                return res.status(400).json({ message: "bad-request" })
-            }
-
-            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm)
             
             if (addmc != "success"){
                 return res.status(400).json({ message: "bad-request" })
@@ -155,11 +151,7 @@ exports.claimtask = async(req, res) => {
         if (pooldetails.subscription != "Pearl"){
             const addtofarm = await 300
 
-            if (addtofarm.message != "success"){
-                return res.status(400).json({ message: "bad-request" })
-            }
-
-            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm)
             
             if (addmc != "success"){
                 return res.status(400).json({ message: "bad-request" })
@@ -192,11 +184,7 @@ exports.claimtask = async(req, res) => {
         if (pooldetails.subscription != "Pearl"){
             const addtofarm = 50
 
-            if (addtofarm.message != "success"){
-                return res.status(400).json({ message: "bad-request" })
-            }
-
-            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm)
             
             if (addmc != "success"){
                 return res.status(400).json({ message: "bad-request" })
@@ -221,11 +209,7 @@ exports.claimtask = async(req, res) => {
         if (pooldetails.subscription != "Pearl"){
             const addtofarm = 50
 
-            if (addtofarm.message != "success"){
-                return res.status(400).json({ message: "bad-request" })
-            }
-
-            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm)
             
             if (addmc != "success"){
                 return res.status(400).json({ message: "bad-request" })
@@ -247,11 +231,7 @@ exports.claimtask = async(req, res) => {
         if (pooldetails.subscription != "Pearl"){
             const addtofarm = await 50
 
-            if (addtofarm.message != "success"){
-                return res.status(400).json({ message: "bad-request" })
-            }
-
-            const addmc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+            const addmc = await addwalletamount(id, "monstercoin", addtofarm)
             
             if (addmc != "success"){
                 return res.status(400).json({ message: "bad-request" })

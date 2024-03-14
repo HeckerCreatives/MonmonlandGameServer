@@ -109,11 +109,8 @@ exports.claimdaily = async (req, res) => {
 
             if (pools.subscription != "Pearl"){
                 const addtofarm = data.rewardsmc
-                if (addtofarm.message != "success"){
-                    return res.status(400).json({message: "bad-request"})
-                }
 
-                const mc = await addwalletamount(id, "monstercoin", addtofarm.mctobeadded)
+                const mc = await addwalletamount(id, "monstercoin", addtofarm)
 
                 if (mc != "success"){
                     return res.status(400).json({message: "bad-request"})
