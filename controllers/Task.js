@@ -4,7 +4,6 @@ const Task = require("../models/Task")
 const Gameunlock = require("../models/Gameunlock")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
 const { addwalletamount } = require("../utils/Walletutils")
-const { addtototalfarmmc } = require("../utils/Gameutils")
 
 exports.gettaskdata = async(req, res) => {
     const { id } = req.user
@@ -117,7 +116,7 @@ exports.claimtask = async(req, res) => {
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
         
         if (pooldetails.subscription != "Pearl"){
-            const addtofarm = await addtototalfarmmc(200, 0)
+            const addtofarm = 200
 
             if (addtofarm.message != "success"){
                 return res.status(400).json({ message: "bad-request" })
@@ -154,7 +153,7 @@ exports.claimtask = async(req, res) => {
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
         
         if (pooldetails.subscription != "Pearl"){
-            const addtofarm = await addtototalfarmmc(300, 0)
+            const addtofarm = await 300
 
             if (addtofarm.message != "success"){
                 return res.status(400).json({ message: "bad-request" })
@@ -191,7 +190,7 @@ exports.claimtask = async(req, res) => {
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
         
         if (pooldetails.subscription != "Pearl"){
-            const addtofarm = await addtototalfarmmc(50, 0)
+            const addtofarm = 50
 
             if (addtofarm.message != "success"){
                 return res.status(400).json({ message: "bad-request" })
@@ -220,7 +219,7 @@ exports.claimtask = async(req, res) => {
         .catch(err => res.status(400).json({ message: "bad-request", data: err.message }));
 
         if (pooldetails.subscription != "Pearl"){
-            const addtofarm = await addtototalfarmmc(50, 0)
+            const addtofarm = 50
 
             if (addtofarm.message != "success"){
                 return res.status(400).json({ message: "bad-request" })
@@ -246,7 +245,7 @@ exports.claimtask = async(req, res) => {
         }
 
         if (pooldetails.subscription != "Pearl"){
-            const addtofarm = await addtototalfarmmc(1000, 0)
+            const addtofarm = await 50
 
             if (addtofarm.message != "success"){
                 return res.status(400).json({ message: "bad-request" })

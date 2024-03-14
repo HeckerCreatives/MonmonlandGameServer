@@ -5,7 +5,6 @@ const Pooldetails = require("../models/Pooldetails")
 const SubsAccumulated = require("../modelweb/SubsAccumulated")
 const { default: mongoose } = require("mongoose")
 const { checkmaintenance } = require("../utils/Maintenance")
-const { addtototalfarmmc } = require("../utils/Gameutils")
 const { addanalytics } = require("../utils/Analytics")
 
 exports.buysubscription = async (req, res) => {
@@ -92,18 +91,6 @@ exports.buysubscription = async (req, res) => {
 
             if (complan != "success"){
                 return res.status(400).json({ message: "bad-request" })
-            }
-
-            const walletamount = await getwalletamount(id, "monstercoin")
-
-            if (!walletamount){
-                return res.json({message: "nowallet"})
-            }
-
-            const addtotalmc = await addtototalfarmmc(walletamount.amount, 0)
-
-            if (addtotalmc.message != "success"){
-                return res.json({message: "failed"})
             }
 
             await SubsAccumulated.findOneAndUpdate({subsname: substype.toLowerCase()}, {$inc: {amount: finalsubsamount}})

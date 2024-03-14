@@ -6,7 +6,6 @@ const { getavailabledailyactivities } = require("../utils/Dailyactivities")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
 const { addwalletamount, addpointswalletamount } = require("../utils/Walletutils")
 const { setleaderboard } = require("../utils/Leaderboards")
-const { addtototalfarmmc } = require("../utils/Gameutils")
 
 exports.getdailyactivities = async (req, res) => {
     const { id } = req.user
@@ -109,7 +108,7 @@ exports.claimdaily = async (req, res) => {
         .then(async () => {
 
             if (pools.subscription != "Pearl"){
-                const addtofarm = await addtototalfarmmc(data.rewardsmc, 0)
+                const addtofarm = data.rewardsmc
                 if (addtofarm.message != "success"){
                     return res.status(400).json({message: "bad-request"})
                 }

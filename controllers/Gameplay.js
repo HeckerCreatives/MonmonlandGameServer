@@ -3,7 +3,7 @@ const Playtimegrinding = require("../models/Playtimegrinding")
 const Energy = require("../models/Energy")
 const { checkenergyinventoryconsumable } = require("../utils/Energyutils")
 const { gettoolsequip, checkalltoolsexpiration } = require("../utils/Toolexpiration")
-const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmc, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue, prizepooladd, fiestarewards, getenergy, energygrindconsumption } = require("../utils/Gameutils")
+const { checkmgtools, checkmgclock, mcmined, clockhoursadd, checkgameavailable, addtototalfarmmg, minustototalcoins, getfarm, getnumbergamespersubs, energyringmgvalue, prizepooladd, fiestarewards, getenergy, energygrindconsumption } = require("../utils/Gameutils")
 const { checkcosmeticequip, checkallcosmeticsexpiration } = require("../utils/Cosmeticutils")
 const { getclockequip, checkallclockexpiration } = require("../utils/Clockexpiration")
 const { getpooldetails } = require("../utils/Pooldetailsutils")
@@ -112,8 +112,6 @@ exports.playgame = async (req, res) => {
     let finalmg = (((mgtool + mgclock + energyringmg) / 24) * timemultipliermg) / getnumbergamespersubs(pooldeets.subscription);
     let monstercoin = mcmined(toolsequip, clocksequip?.type == null ? 0 : clocksequip.type)
 
-    console.log(finalmg, "this is the raw mg")
-
     const expiredtime = DateTimeGameExpiration(clockhoursadd(clocksequip?.type == null ? 0 : clocksequip.type))
     
     //  Check energy
@@ -145,18 +143,16 @@ exports.playgame = async (req, res) => {
     let finalap = monstercoin;
 
     if (pooldeets.subscription != "Pearl"){
-        const addtotalmc = await addtototalfarmmc(monstercoin, finalmg)
+        const addtotalmg = await addtototalfarmmg(finalmg)
 
-        if (addtotalmc.message != "success"){
+        console.log(addtotalmg)
+
+        if (addtotalmg.message != "success"){
             return res.json({message: "failed"})
         }
     
-        if (monstercoin > addtotalmc.mctobeadded){
-            monstercoin = addtotalmc.mctobeadded
-        }
-    
-        if (finalmg > addtotalmc.mgtobeadded){
-            finalmg = addtotalmc.mgtobeadded
+        if (finalmg > addtotalmg.mgtobeadded){
+            finalmg = addtotalmg.mgtobeadded
         }
     }
 
@@ -586,23 +582,9 @@ exports.endpalosebo = async (req, res) => {
             .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
         }
         else if (prizes.type == "monster coin"){
-            const addtotalmc = await addtototalfarmmc(parseInt(prizes.name), 0)
-
-            if (addtotalmc.message != "success"){
-                return res.json({message: "failed"})
-            }
-        
-            if (parseInt(prizes.name) > addtotalmc.mctobeadded){
-                const mcadd = await addwalletamount(id, "monstercoin", addtotalmc.mctobeadded)
-                if (mcadd != "success"){
-                    return res.status(400).json({ message: "bad-request" })
-                }
-            }
-            else{
-                const mcadd = await addwalletamount(id, "monstercoin", parseInt(prizes.name))
-                if (mcadd != "success"){
-                    return res.status(400).json({ message: "bad-request" })
-                }
+            const mcadd = await addwalletamount(id, "monstercoin", parseInt(prizes.name))
+            if (mcadd != "success"){
+                return res.status(400).json({ message: "bad-request" })
             }
         }
     }
@@ -883,23 +865,10 @@ exports.endsupermonmon = async (req, res) => {
             .catch(err => res.status(400).json({ message: "bad-request", data: err.message }))
         }
         else if (prizes.type == "monster coin"){
-            const addtotalmc = await addtototalfarmmc(parseInt(prizes.name), 0)
+            const mcadd = await addwalletamount(id, "monstercoin", parseInt(prizes.name))
 
-            if (addtotalmc.message != "success"){
-                return res.json({message: "failed"})
-            }
-        
-            if (parseInt(prizes.name) > addtotalmc.mctobeadded){
-                const mcadd = await addwalletamount(id, "monstercoin", addtotalmc.mctobeadded)
-                if (mcadd != "success"){
-                    return res.status(400).json({ message: "bad-request" })
-                }
-            }
-            else{
-                const mcadd = await addwalletamount(id, "monstercoin", parseInt(prizes.name))
-                if (mcadd != "success"){
-                    return res.status(400).json({ message: "bad-request" })
-                }
+            if (mcadd != "success"){
+                return res.status(400).json({ message: "bad-request" })
             }
         }
     }
