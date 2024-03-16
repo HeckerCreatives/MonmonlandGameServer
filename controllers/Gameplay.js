@@ -145,8 +145,6 @@ exports.playgame = async (req, res) => {
     if (pooldeets.subscription != "Pearl"){
         const addtotalmg = await addtototalfarmmg(finalmg)
 
-        console.log(addtotalmg)
-
         if (addtotalmg.message != "success"){
             return res.json({message: "failed"})
         }

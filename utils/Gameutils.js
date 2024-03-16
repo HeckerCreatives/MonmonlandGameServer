@@ -187,7 +187,12 @@ exports.addtototalfarmmg = async (mgfarm) => {
     .then(data => data.amount)
     .catch(() => "bad-request")
 
+    const gameactmg = await Gameactivity.findOne()
+    .then(data => data.initial)
+    .catch(() => "bad-request")
+
     let maxmgamount = comactmg
+    maxmgamount += gameactmg
 
     const remainingmgSpace = maxmgamount - mongem;
     let mgtobeadded = 0
