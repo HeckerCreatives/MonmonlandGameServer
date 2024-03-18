@@ -278,12 +278,10 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
             }
             
             await Gamewallet.findOneAndUpdate({owner: new mongoose.Types.ObjectId(directreferralid), wallettype: "directpoints"}, {$inc: {amount: pointsamount}})
-            .then(async () => {
-                return await Walletscutoff.findOneAndUpdate({owner: new mongoose.Types.ObjectId(directreferralid), wallettype: "directpoints"}, {$inc: {amount: pointsamount}})
-                .catch(err => {
-                    return "bad-request"
-                })
+            .catch(err => {
+                return "bad-request"
             })
+            await Walletscutoff.findOneAndUpdate({owner: new mongoose.Types.ObjectId(directreferralid), wallettype: "directpoints"}, {$inc: {amount: pointsamount}})
             .catch(err => {
                 return "bad-request"
             })
