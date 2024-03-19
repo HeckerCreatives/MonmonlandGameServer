@@ -6,10 +6,10 @@ exports.computecomplan = async (amount) => {
 
     let response = ""
                 
-    const complan = (amount * 0.40)
+    const complan = (amount * 0.19)
     const leaderboards = (amount * 0.02)
     const grinding = (amount * 0.20)
-    const monstergem = (amount * 0.15)
+    const monstergem = (amount * 0.36)
     const diamondpools = (amount * 0.01)
     const incentives = (amount * 0.03)
     const marketing = (amount * 0.02)
@@ -117,10 +117,10 @@ exports.computemerchcomplan = async (amount, itemtype) => {
         complanmerchid = process.env.complantools
     }
                 
-    const complan = (amount * 0.30)
+    const complan = (amount * 0.19)
     const leaderboards = (amount * 0.03)
     const grinding = (amount * 0.20)
-    const monstergem = (amount * 0.30)
+    const monstergem = (amount * 0.41)
     const diamondpools = (amount * 0.02)
     const incentives = (amount * 0.02)
     const marketing = (amount * 0.01)
@@ -218,10 +218,10 @@ exports.computeshopcomplan = async (amount, itemtype) => {
         return
     })
 
-    const complan = (amount * 0.30)
+    const complan = (amount * 0.19)
     const leaderboards = (amount * 0.03)
     const grinding = (amount * 0.20)
-    const monstergem = (amount * 0.30)
+    const monstergem = (amount * 0.41)
     const diamondpools = (amount * 0.02)
     const incentives = (amount * 0.02)
     const marketing = (amount * 0.01)

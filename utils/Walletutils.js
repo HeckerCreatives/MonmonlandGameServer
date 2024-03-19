@@ -117,10 +117,10 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
                                 { case: { $eq: ['$referralChain.level', 0] }, then: { $cond: {
                                             if: { $eq: ['$referralChain._id', new mongoose.Types.ObjectId(process.env.MONMONLAND_ID)]},
                                             then: {
-                                                $multiply: [commissionAmount, 0.40]
+                                                $multiply: [commissionAmount, 0.19]
                                             },
                                             else : {
-                                                $multiply: [commissionAmount, 0.15]
+                                                $multiply: [commissionAmount, 0.10]
                                             }
                                         } 
                                     }
@@ -128,10 +128,10 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
                                 { case: { $eq: ['$referralChain.level', 1] }, then: { $cond: {
                                             if: { $eq: ['$referralChain._id', new mongoose.Types.ObjectId(process.env.MONMONLAND_ID)]},
                                             then: {
-                                                $multiply: [commissionAmount, 0.25]
+                                                $multiply: [commissionAmount, 0.09]
                                             },
                                             else : {
-                                                $multiply: [commissionAmount, 0.07]
+                                                $multiply: [commissionAmount, 0.01]
                                             }
                                         } 
                                     }
@@ -139,10 +139,10 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
                                 { case: { $eq: ['$referralChain.level', 2] }, then: { $cond: {
                                             if: { $eq: ['$referralChain._id', new mongoose.Types.ObjectId(process.env.MONMONLAND_ID)]},
                                             then: {
-                                                $multiply: [commissionAmount, 0.18]
+                                                $multiply: [commissionAmount, 0.08]
                                             },
                                             else : {
-                                                $multiply: [commissionAmount, 0.05]
+                                                $multiply: [commissionAmount, 0.01]
                                             }
                                         } 
                                     }
@@ -150,10 +150,10 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
                                 { case: { $eq: ['$referralChain.level', 3] }, then: { $cond: {
                                             if: { $eq: ['$referralChain._id', new mongoose.Types.ObjectId(process.env.MONMONLAND_ID)]},
                                             then: {
-                                                $multiply: [commissionAmount, 0.13]
+                                                $multiply: [commissionAmount, 0.07]
                                             },
                                             else : {
-                                                $multiply: [commissionAmount, 0.04]
+                                                $multiply: [commissionAmount, 0.01]
                                             }
                                         } 
                                     }
@@ -161,10 +161,10 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
                                 { case: { $eq: ['$referralChain.level', 4] }, then: { $cond: {
                                             if: { $eq: ['$referralChain._id', new mongoose.Types.ObjectId(process.env.MONMONLAND_ID)]},
                                             then: {
-                                                $multiply: [commissionAmount, 0.09]
+                                                $multiply: [commissionAmount, 0.06]
                                             },
                                             else : {
-                                                $multiply: [commissionAmount, 0.03]
+                                                $multiply: [commissionAmount, 0.01]
                                             }
                                         } 
                                     }
@@ -172,10 +172,10 @@ exports.sendcommissiontounilevel = async(commissionAmount, id, substype) => {
                                 { case: { $eq: ['$referralChain.level', 5] }, then: { $cond: {
                                             if: { $eq: ['$referralChain._id', new mongoose.Types.ObjectId(process.env.MONMONLAND_ID)]},
                                             then: {
-                                                $multiply: [commissionAmount, 0.06]
+                                                $multiply: [commissionAmount, 0.05]
                                             },
                                             else : {
-                                                $multiply: [commissionAmount, 0.02]
+                                                $multiply: [commissionAmount, 0.01]
                                             }
                                         } 
                                     }
@@ -595,17 +595,17 @@ exports.addpointswalletamount = async (id, wallettype, amount) => {
 function getmgunilevelpercentage(level){
     switch (level){
         case 0:
-            return 0.10
+            return 0.19
         case 1:
-            return 0.05
+            return 0.01
         case 2:
-            return 0.04
+            return 0.01
         case 3: 
-            return 0.03
+            return 0.01
         case 4:
-            return 0.02
+            return 0.01
         case 5:
-            return 0.02
+            return 0.01
         case 6:
             return 0.01
         case 7:
@@ -620,17 +620,17 @@ function getmgunilevelpercentage(level){
 function getremainingmglevelpercentage(level){
     switch (level){
         case 0:
-            return 0.30
+            return 0.19
         case 1:
-            return 0.20
+            return 0.09
         case 2:
-            return 0.15
-        case 3: 
-            return 0.11
-        case 4:
             return 0.08
-        case 5:
+        case 3: 
+            return 0.07
+        case 4:
             return 0.06
+        case 5:
+            return 0.05
         case 6:
             return 0.04
         case 7:
