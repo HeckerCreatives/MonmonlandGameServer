@@ -6,17 +6,18 @@ exports.computecomplan = async (amount) => {
 
     let response = ""
                 
-    const complan = (amount * 0.19)
-    const leaderboards = (amount * 0.02)
+    const complan = (amount * 0.40)
+    const leaderboards = (amount * 0.0)
     const grinding = (amount * 0.20)
-    const monstergem = (amount * 0.36)
-    const diamondpools = (amount * 0.01)
-    const incentives = (amount * 0.03)
-    const marketing = (amount * 0.02)
+    const monstergem = (amount * 0.0)
+    const diamondpools = (amount * 0.05)
+    const incentives = (amount * 0.05)
+    const marketing = (amount * 0.03)
     const investorfunds = (amount * 0.02)
-    const officers = (amount * 0.08)
+    const officers = (amount * 0.15)
     const devsshare = (amount * 0.05)
     const companyshare = (amount * 0.02)
+    const systempands = (amount * 0.03)
 
     const bulkOperations = [
         {
@@ -84,6 +85,12 @@ exports.computecomplan = async (amount) => {
                 filter: { _id: new mongoose.Types.ObjectId(process.env.complanpayin)},
                 update: { $inc: { amount: complan }}
             }
+        },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.systempandsca)},
+                update: { $inc: { amount: systempands }}
+            }
         }
     ]
 
@@ -118,16 +125,17 @@ exports.computemerchcomplan = async (amount, itemtype) => {
     }
                 
     const complan = (amount * 0.19)
-    const leaderboards = (amount * 0.03)
+    const leaderboards = (amount * 0.02)
     const grinding = (amount * 0.20)
-    const monstergem = (amount * 0.41)
-    const diamondpools = (amount * 0.02)
+    const monstergem = (amount * 0.40)
+    const diamondpools = (amount * 0.01)
     const incentives = (amount * 0.02)
     const marketing = (amount * 0.01)
-    const investorfunds = (amount * 0.0)
+    const investorfunds = (amount * 0.01)
     const officers = (amount * 0.05)
     const devsshare = (amount * 0.05)
     const companyshare = (amount * 0.02)
+    const systempands = (amount * 0.02)
 
     const bulkOperations = [
         {
@@ -195,6 +203,12 @@ exports.computemerchcomplan = async (amount, itemtype) => {
                 filter: { _id: new mongoose.Types.ObjectId(complanmerchid)},
                 update: { $inc: { amount: complan }}
             }
+        },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.systempandsca)},
+                update: { $inc: { amount: systempands }}
+            }
         }
     ]
 
@@ -219,16 +233,17 @@ exports.computeshopcomplan = async (amount, itemtype) => {
     })
 
     const complan = (amount * 0.19)
-    const leaderboards = (amount * 0.03)
+    const leaderboards = (amount * 0.02)
     const grinding = (amount * 0.20)
-    const monstergem = (amount * 0.41)
-    const diamondpools = (amount * 0.02)
+    const monstergem = (amount * 0.40)
+    const diamondpools = (amount * 0.01)
     const incentives = (amount * 0.02)
     const marketing = (amount * 0.01)
-    const investorfunds = (amount * 0.0)
+    const investorfunds = (amount * 0.01)
     const officers = (amount * 0.05)
     const devsshare = (amount * 0.05)
     const companyshare = (amount * 0.02)
+    const systempands = (amount * 0.02)
 
     const bulkOperations = [
         {
@@ -293,8 +308,14 @@ exports.computeshopcomplan = async (amount, itemtype) => {
         },
         {
             updateOne: {
-                filter: { _id: new mongoose.Types.ObjectId(process.env.complancosmetics)},
+                filter: { _id: new mongoose.Types.ObjectId(complanmerchid)},
                 update: { $inc: { amount: complan }}
+            }
+        },
+        {
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(process.env.systempandsca)},
+                update: { $inc: { amount: systempands }}
             }
         }
     ]
