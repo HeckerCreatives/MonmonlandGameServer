@@ -1,4 +1,4 @@
-const { sendcommissiontounilevel, checkwalletamount, addwalletamount, getwalletamount } = require("../utils/Walletutils")
+const { sendcommissiontounilevel, checkwalletamount, addwalletamount, getwalletamount, addtoken, checkairdroplimit } = require("../utils/Walletutils")
 const { getsubsamount, getpooldetails } = require("../utils/Pooldetailsutils")
 const { computecomplan } = require("../webutils/Communityactivityutils")
 const Pooldetails = require("../models/Pooldetails")
@@ -6,6 +6,7 @@ const SubsAccumulated = require("../modelweb/SubsAccumulated")
 const { default: mongoose } = require("mongoose")
 const { checkmaintenance } = require("../utils/Maintenance")
 const { addanalytics } = require("../utils/Analytics")
+const Gameusers = require("../models/Gameusers")
 
 exports.buysubscription = async (req, res) => {
     const { id } = req.user
@@ -93,6 +94,12 @@ exports.buysubscription = async (req, res) => {
                 return res.status(400).json({ message: "bad-request" })
             }
 
+            const walletamount = await getwalletamount(id, "monstercoin")
+
+            if (!walletamount){
+                return res.json({message: "nowallet"})
+            }
+
             await SubsAccumulated.findOneAndUpdate({subsname: substype.toLowerCase()}, {$inc: {amount: finalsubsamount}})
             .then(async () => {
                 const analyticsadd = await addanalytics(id, `Buy Subscription (${substype})`, finalsubsamount)
@@ -101,7 +108,54 @@ exports.buysubscription = async (req, res) => {
                     return res.status(400).json({ message: "bad-requestasdfasd" })
                 }
 
-                return res.json({message: "success"})
+                if(pooldetails.subscription != "Pearl"){
+                    return res.json({message: "success"})
+                } else {
+                    // activaaateee heeem
+                    await Gameusers.findOneAndUpdate({_id: new mongoose.Types.ObjectId(id)},{status: "active"})
+
+                    let tokentoreceive;
+                    switch(substype){
+                        case "Pearlplus":
+                            tokentoreceive = 100;
+                        case "Ruby":
+                            tokentoreceive = 200;
+                        case "Emerald":
+                            tokentoreceive = 500;
+                        case "Diamond":
+                            tokentoreceive = 1000;
+                        default:
+                    }
+
+                    const airdroplimit = await checkairdroplimit((tokentoreceive * 2), "MMT")
+                    const directreferralid = await Gameusers.findOne({_id: new mongoose.Types.ObjectId(id)}).then(e => e.referral)
+                    
+                    if(airdroplimit == "bad-request"){
+                        return res.status(400).json({ message: "bad-request" })
+                    }
+
+                    if(airdroplimit == 'notlimit'){
+                        const addmmt = await addtoken(id, substype)
+
+                        if(addmmt == "bad-request"){
+                            return res.status(400).json({ message: "bad-request" })
+                        }
+
+                        if(addmmt == 'success'){
+                            const addmmttoreferal = await addtoken(directreferralid, substype)
+
+                            if(addmmttoreferal == "bad-request"){
+                                return res.status(400).json({ message: "bad-request" })
+                            }
+
+                            return res.json({message: "success"})
+                        }
+                    } else {
+                        return res.json({message: "success"})
+                    }
+                }
+
+                
             })
             .catch(err => res.status(400).json({ message: "bad-request whaat", data: err.message }))
         })
