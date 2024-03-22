@@ -308,7 +308,7 @@ exports.computeshopcomplan = async (amount, itemtype) => {
         },
         {
             updateOne: {
-                filter: { _id: new mongoose.Types.ObjectId(complanmerchid)},
+                filter: { _id: new mongoose.Types.ObjectId(complancosmetics)},
                 update: { $inc: { amount: complan }}
             }
         },
